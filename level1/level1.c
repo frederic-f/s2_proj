@@ -89,15 +89,14 @@ int main(int argc, char* argv[])
     SDL_FreeSurface(temp) ;
 
     /* creation of a cache to hide the launcher sprite */
-
     SDL_Rect cache ;
     cache.x = 0 ;
     cache.y = 0 ;
     cache.w = SCREEN_WIDTH ;
     cache.h = SCREEN_HEIGHT ;
 
+    /* cache will be black */
     int color = SDL_MapRGB(screen->format, 0, 0, 0) ;
-
 
     /* setup SPRITE colorkey and turn on RLE */
     colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
