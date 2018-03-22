@@ -100,8 +100,8 @@ int main(int argc, char* argv[])
 
     /* setup SPRITE colorkey and turn on RLE */
     colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+   
     SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
-
 
     /* setup FRAME colorkey and turn on RLE */
     SDL_SetColorKey(frame, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
             HandleEvent(event, &gameover, &currentOrientation);
         }
 
-        // draw the cache
+       // draw the cache
         SDL_FillRect(screen, &cache, color) ;
 
 
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
         SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition) ;
 
 
-
+ 
 
         /* update the screen */
         SDL_UpdateRect(screen, 0, 0, 0, 0);
