@@ -1,24 +1,29 @@
 #include <SDL.h>
+#include <math.h>
+#include "SDL_TTF.h"
 
 /* Size of the window */
-#define SCREEN_WIDTH  720
-#define SCREEN_HEIGHT 540
+#define SCREEN_WIDTH      720
+#define SCREEN_HEIGHT     540
 
+#define BOARD_LEFT        200
+#define BOARD_RIGHT       520
+#define BOARD_TOP         31
 
 /* In the sprite, we have 45 images of a 187x157 picture */
 
 /* Size of one image: */
-#define LAUNCHER_WIDTH     187
-#define LAUNCHER_HEIGHT    157
-#define LAUNCHER_CENTER    94
+#define LAUNCHER_WIDTH    187
+#define LAUNCHER_HEIGHT   157
+#define LAUNCHER_CENTER   94
 
 
 #define PI 3.14159265359
-#define BOARD_LEFT       200 // x-coord of left border of game board
 
 
-#define BUB_SIZE       40 // horizontal and vertical size 
-
+#define BUB_SIZE          40 // horizontal and vertical size
+#define BUB_START_Y       457
+#define VELOCITY          2  // bubble velocity
 
 /* Handle events coming from the user:
         - quit the game?
@@ -28,7 +33,7 @@
    We also change the animation bit used for creating the "walk" effect.
    */
 void HandleEvent(SDL_Event event,
-        int *quit, int *currOrientation)
+        int *quit, int *currOrientation, SDL_Rect * bubPosition)
 {
     switch (event.type) {
         /* close button clicked */
@@ -56,9 +61,43 @@ void HandleEvent(SDL_Event event,
                     }
                     break;
 
-	        case SDLK_SPACE:
-		    *currOrientation += 1 ;
-		    break;
+                case SDLK_SPACE:
+                    // lauches the buble
+                    // movement either to the right or left according to launcher direction
+                    // stop when touch either left (resp) right touches left (resp) righ border
+
+                    /* if bubble not on laucher : get it back on launcher
+                     * otherwise, launch the bubble */
+
+                    /* to check if bubble is on launcher, we use Y coordinates (since Y WILL be different if bubble moved */
+                    if (bubPosition -> y != BUB_START_Y) {
+                        /* bubble return to launcher */
+                        bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+                        bubPosition -> y = BUB_START_Y ;
+                    } else {
+                        /* bubble is launched */
+                        if (*currOrientation < 22) {
+                            /* stops when touches left border */
+                            bubPosition -> y -= VELOCITY ;
+                            while (bubPosition -> x > BOARD_LEFT) {
+                                bubPosition -> x -= VELOCITY ;
+                            }
+                        } else if (*currOrientation > 22) {
+                            /* stops when touches RIGHT border */
+
+                            bubPosition -> y -= VELOCITY ;
+                            while (bubPosition -> x < BOARD_RIGHT - BUB_SIZE) {
+                                bubPosition -> x += VELOCITY ;
+                            }
+                        } else {
+                            /* bubble should go straight up */
+                            while (bubPosition -> y > BOARD_TOP) {
+                                bubPosition -> y -= VELOCITY ;
+                            }
+                        }
+                    }
+
+                    break;
     
                 default:
                     break;
@@ -67,16 +106,23 @@ void HandleEvent(SDL_Event event,
     }
 }
 
+
+
+
 int main(int argc, char* argv[])
 {
-  SDL_Surface *screen, *temp, *sprite, *frame, *bubSprite;
+    double sinx = sin (PI) ;
+
+    printf("sin: %f", sinx) ;
+
+
+
+    SDL_Surface *screen, *temp, *sprite, *frame, *bubSprite;
 
     int colorkey;
 
     /* Information about the current situation of the launcher sprite */
     int currentOrientation = 22 ; // 0 = pointing left, 22 = upwards, 45 = right
-
-
 
     /* initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
@@ -88,7 +134,7 @@ int main(int argc, char* argv[])
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     /* set keyboard repeat */
-    SDL_EnableKeyRepeat(10, 10);
+    SDL_EnableKeyRepeat(100, 30);
 
     /* load frame */
     temp  = SDL_LoadBMP("frame_1p.bmp");
@@ -100,7 +146,7 @@ int main(int argc, char* argv[])
     sprite = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
 
-    /* load bubble */
+    /* BUBBLE SPRITE */
     temp = SDL_LoadBMP("bub_blue.bmp");
     bubSprite = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
@@ -144,7 +190,7 @@ int main(int argc, char* argv[])
 
     /* set sprite BUBBLE position initialy on top of launcher */
     bubPosition.x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
-    bubPosition.y = 457 ;
+    bubPosition.y = BUB_START_Y ;
 
     int gameover = 0;
 
@@ -156,21 +202,21 @@ int main(int argc, char* argv[])
         /* look for an event; possibly update the position and the shape
          * of the sprite. */
         if (SDL_PollEvent(&event)) {
-            HandleEvent(event, &gameover, &currentOrientation);
+            HandleEvent(event, &gameover, &currentOrientation, &bubPosition);
         }
 
        // draw the cache
         SDL_FillRect(screen, &cache, color) ;
 
 
-	// draw the frame
+	    // draw the frame
         // first a Rect for the position
-	SDL_Rect framePosition;
+	    SDL_Rect framePosition;
         // then set the position
         framePosition.x = 0 ;
         framePosition.y = 0 ;
         // then draw on screen
-	SDL_BlitSurface(frame, NULL, screen, &framePosition) ;
+	    SDL_BlitSurface(frame, NULL, screen, &framePosition) ;
 
 
         // draw the sprit LAUNCHER
@@ -183,18 +229,20 @@ int main(int argc, char* argv[])
         SDL_BlitSurface(sprite, &spriteImage, screen, &spritePosition) ;
 
 
-	// draw the bubble
-	SDL_Rect bubImage ;
-	bubImage.w = BUB_SIZE ;
-	bubImage.h = BUB_SIZE ;
-	bubImage.x = 0 ;
-	bubImage.y = 0 ;
+	    // draw the bubble
+	    SDL_Rect bubImage ;
+	    bubImage.w = BUB_SIZE ;
+	    bubImage.h = BUB_SIZE ;
+	    bubImage.x = 0 ;
+	    bubImage.y = 0 ;
 	
-	SDL_BlitSurface(bubSprite, &bubImage, screen, &bubPosition) ; 
+	    SDL_BlitSurface(bubSprite, &bubImage, screen, &bubPosition) ;
 
 
         /* update the screen */
         SDL_UpdateRect(screen, 0, 0, 0, 0);
+
+        //printf ("%d\n", currentOrientation) ;
     }
 
     /* clean up */
