@@ -73,11 +73,15 @@ double calculateAngle (int currOrientation) {
 
 }
 
-int calculate_Y (int dx, double angle) {
+/* function that calculate the Y position of bubble
+ * according to X position and angle*/
+int calculate_Y (int dx, int orientation) {
 
     int dy ;
 
-    dy = dx * (sin(angle) / cos(angle)) ;
+    double angle = calculateAngle(orientation);
+
+    dy = dx * ((sin(angle) / cos(angle)));
 
     return dy ;
 }
@@ -138,15 +142,34 @@ void HandleEvent(SDL_Event event,
                         /* bubble IS ON LAUNCHER
                          * we launch it */
 
-                       /* dy = dx * ( sin (teta) / cos (teta) ) */
+                        if (*currOrientation == 22) {
+                            bubPosition -> y = BOARD_TOP ;
+                        }
+                        else {
+                            if (*currOrientation > 22) {
+                                int x_target, dx, y_target ;
+                                x_target = BOARD_RIGHT - BUB_SIZE ;
+                                dx = abs (BOARD_RIGHT - bubPosition -> x) ;
+
+                                y_target = calculate_Y(dx, *currOrientation) ;
+
+                                bubPosition -> x = x_target ;
+                                bubPosition -> y -= y_target ;
+                            }
+                            else {
+                                int x_target, dx, y_target ;
+                                x_target = BOARD_LEFT ;
+                                dx = abs (BOARD_LEFT - bubPosition -> x) ;
+
+                                y_target = calculate_Y(dx, *currOrientation) ;
+
+                                bubPosition -> x = x_target ;
+                                bubPosition -> y -= y_target ;
+                            }
+                        }
 
 
 
-                        int dx = BOARD_RIGHT - bubPosition -> x ;
-                        int dy = calculate_Y (dx, calculateAngle(*currOrientation)) ;
-
-                        bubPosition -> x = bubPosition -> x + dx ;
-                        bubPosition -> y = bubPosition -> y - dy ;
 
 
                         /* calculates y target position according to cuurent position and launcher angle */
