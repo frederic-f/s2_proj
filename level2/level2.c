@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 
 
 /* Size of the window */
@@ -94,13 +95,30 @@ int calculate_Y (int dx, int orientation) {
    We also change the animation bit used for creating the "walk" effect.
    */
 void HandleEvent(SDL_Event event,
-        int * quit, int * currOrientation, SDL_Rect * bubPosition)
+        int * quit, int * currOrientation, SDL_Rect * bubPosition, bool * bubLaunching)
 {
     switch (event.type) {
         /* close button clicked */
         case SDL_QUIT:
             *quit = 1;
             break;
+
+
+        case SDL_KEYUP:
+            switch (event.key.keysym.sym) {
+                case SDLK_SPACE:
+
+                    if(!*bubLaunching) {
+                        *bubLaunching = true ;
+                    }
+
+                    break ;
+
+                default:
+                    break;
+            }
+            break;
+
 
         /* handle the keyboard */
         case SDL_KEYDOWN:
@@ -123,7 +141,6 @@ void HandleEvent(SDL_Event event,
                     }
                     break;
 
-                case SDLK_SPACE:
 
                     /* LAUNCHES THE BUBBLE
                      * movement either to the right or left according to launcher direction
@@ -131,84 +148,6 @@ void HandleEvent(SDL_Event event,
 
                     /* If bubble NOT ON LAUNCHER : get it back on launcher
                      * to check if bubble is on launcher, we use Y coordinates (since Y WILL be different if bubble moved */
-                    if (bubPosition -> y != BUB_START_Y) {
-
-                        /* return bubble to launcher */
-                        bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
-                        bubPosition -> y = BUB_START_Y ;
-                    }
-                    else {
-
-                        /* bubble IS ON LAUNCHER
-                         * we launch it */
-
-                        if (*currOrientation == 22) {
-                            bubPosition -> y = BOARD_TOP ;
-                        }
-                        else {
-                            if (*currOrientation > 22) {
-                                int x_target, dx, y_target ;
-                                x_target = BOARD_RIGHT - BUB_SIZE ;
-                                dx = abs (BOARD_RIGHT - bubPosition -> x) ;
-
-                                y_target = calculate_Y(dx, *currOrientation) ;
-
-                                bubPosition -> x = x_target ;
-                                bubPosition -> y -= y_target ;
-                            }
-                            else {
-                                int x_target, dx, y_target ;
-                                x_target = BOARD_LEFT ;
-                                dx = abs (BOARD_LEFT - bubPosition -> x) ;
-
-                                y_target = calculate_Y(dx, *currOrientation) ;
-
-                                bubPosition -> x = x_target ;
-                                bubPosition -> y -= y_target ;
-                            }
-                        }
-
-
-
-
-
-                        /* calculates y target position according to cuurent position and launcher angle */
-
-
-
-/*                        *//* to the LEFT *//*
-                        if (*currOrientation < 22) {
-
-                            *//* shift slightly on y-axis
-                             * so we know that it has moved
-                             * (we check unmove by comparing y bubPosition to BUB_START_Y, so if there is no change in Y, we ll think it is on launcher *//*
-                            bubPosition -> y -= VELOCITY ;
-
-                            *//* then moves and stops when touches left border*//*
-                            while (bubPosition -> x > BOARD_LEFT) {
-                                bubPosition -> x -= VELOCITY ;
-                            }
-
-                            *//* we know the final x position - BOARD_LEFT *//*
-
-                        } else if (*currOrientation > 22) {
-                            *//* stops when touches RIGHT border *//*
-
-                            bubPosition -> y -= VELOCITY ;
-                            while (bubPosition -> x < BOARD_RIGHT - BUB_SIZE) {
-                                bubPosition -> x += VELOCITY ;
-                            }
-                        } else {
-                            *//* bubble should go straight up *//*
-                            while (bubPosition -> y > BOARD_TOP) {
-                                bubPosition -> y -= VELOCITY ;
-                            }
-                        }*/
-
-
-                    }
-
-                    break;
     
                 default:
                     break;
@@ -219,6 +158,60 @@ void HandleEvent(SDL_Event event,
 
 
 
+void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving)
+{
+    /* if bub NOT on launcher and NOT moving
+     * then return it to launcher */
+    if (bubPosition -> y != BUB_START_Y) {
+
+        /* return bubble to launcher */
+        bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+        bubPosition -> y = BUB_START_Y ;
+    }
+    else {
+        /* bubble starts moving from launcher*/
+        *bubMoving = true ;
+    }
+
+    /* in all cases, launching is finished */
+    *bubLaunching = false ;
+}
+
+
+
+void moveBub (SDL_Rect * bubPosition, bool *bubMoving, int *currOrientation)
+{
+
+
+    if (*currOrientation == 22) {
+        bubPosition -> y = BOARD_TOP ;
+    }
+    else {
+        if (*currOrientation > 22) {
+            int x_target, dx, y_target ;
+            x_target = BOARD_RIGHT - BUB_SIZE ;
+            dx = abs (BOARD_RIGHT - bubPosition -> x) ;
+
+            y_target = calculate_Y(dx, *currOrientation) ;
+
+            bubPosition -> x = x_target ;
+            bubPosition -> y -= y_target ;
+        }
+        else {
+            int x_target, dx, y_target ;
+            x_target = BOARD_LEFT ;
+            dx = abs (BOARD_LEFT - bubPosition -> x) ;
+
+            y_target = calculate_Y(dx, *currOrientation) ;
+
+            bubPosition -> x = x_target ;
+            bubPosition -> y -= y_target ;
+        }
+    }
+
+    *bubMoving = false ;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -227,7 +220,21 @@ int main(int argc, char* argv[])
     int colorkey;
 
     /* Information about the current situation of the launcher sprite */
-    int currentOrientation = 22 ; // 0 = pointing left, 22 = upwards, 45 = right
+    /* 0 = pointing left, 22 = upwards, 45 = right*/
+    int currentOrientation = 22 ;
+
+
+    /* Is the bubble being launched? */
+    bool bubLaunching ;
+    bubLaunching = false ;
+
+    /* Is the bubble moving?*/
+    bool bubMoving ;
+    bubMoving = false ;
+
+    bool testBool ;
+
+    /* used to control angle*/
     double currentAngle = 0. ;
 
     /* initialize SDL */
@@ -240,7 +247,7 @@ int main(int argc, char* argv[])
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     /* set keyboard repeat */
-    SDL_EnableKeyRepeat(100, 30);
+    SDL_EnableKeyRepeat(10, 10);
 
     /* load frame */
     temp  = SDL_LoadBMP("frame_1p.bmp");
@@ -308,8 +315,21 @@ int main(int argc, char* argv[])
         /* look for an event; possibly update the position and the shape
          * of the sprite. */
         if (SDL_PollEvent(&event)) {
-            HandleEvent(event, &gameover, &currentOrientation, &bubPosition);
+            HandleEvent(event, &gameover, &currentOrientation, &bubPosition, &bubLaunching);
         }
+
+
+        /* if bubble is moving we move it */
+
+        if (bubLaunching) {
+            launchBub (&bubPosition, &bubLaunching, &bubMoving) ;
+        }
+
+
+        if (bubMoving) {
+            moveBub(&bubPosition, &bubMoving, &currentOrientation) ;
+        }
+
 
 
         /* calculation of currentAngle*/
