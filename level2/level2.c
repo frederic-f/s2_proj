@@ -25,7 +25,7 @@
 
 #define BUB_SIZE          40 // horizontal and vertical size
 #define BUB_START_Y       457
-#define VELOCITY          2  // bubble velocity
+#define VELOCITY          1  // bubble velocity
 
 
 /* DEBUGGING FUNCTIONS
@@ -50,7 +50,7 @@ void ra () {
 
 void sp () {
     SDL_Event sdlevent;
-    sdlevent.type = SDL_KEYDOWN;
+    sdlevent.type = SDL_KEYUP;
     sdlevent.key.keysym.sym = SDLK_SPACE;
 
     SDL_PushEvent(&sdlevent);
@@ -76,16 +76,34 @@ double calculateAngle (int currOrientation) {
 
 /* function that calculate the Y position of bubble
  * according to X position and angle*/
-int calculate_Y (int dx, int orientation) {
+double calculate_Y (double target_x, int orientation, double bub_x, double bub_y) {
 
-    int dy ;
+    double dy, dx ;
+
+    dx = abs (target_x - bub_x) ;
 
     double angle = calculateAngle(orientation);
 
     dy = dx * ((sin(angle) / cos(angle)));
 
-    return dy ;
+    return bub_y - dy ;
 }
+
+/* function that calculate the X position of bubble
+ * according to Y position and angle*/
+double calculate_X (double target_y, int orientation, double bub_x, double bub_y) {
+
+    double dy, dx ;
+
+    dy = abs (target_y - bub_y) ;
+
+    double angle = calculateAngle(orientation);
+
+    dx = dy * ((cos(angle) / sin(angle)));
+
+    return bub_x - dx ;
+}
+
 
 /* Handle events coming from the user:
         - quit the game?
@@ -158,7 +176,7 @@ void HandleEvent(SDL_Event event,
 
 
 
-void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving)
+void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving, double *bub_x, double *bub_y)
 {
     /* if bub NOT on launcher and NOT moving
      * then return it to launcher */
@@ -167,6 +185,10 @@ void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving)
         /* return bubble to launcher */
         bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
         bubPosition -> y = BUB_START_Y ;
+
+        *bub_x = bubPosition -> x ;
+        *bub_y = bubPosition -> y ;
+
     }
     else {
         /* bubble starts moving from launcher*/
@@ -179,37 +201,48 @@ void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving)
 
 
 
-void moveBub (SDL_Rect * bubPosition, bool *bubMoving, int *currOrientation)
+void moveBub (SDL_Rect *bubPosition, bool *bubMoving, int *currOrientation, double *bub_x, double *bub_y)
 {
+
+    /* temp variables */
+    int target_x, target_y ;
 
 
     if (*currOrientation == 22) {
-        bubPosition -> y = BOARD_TOP ;
+        target_y = *bub_y - VELOCITY ;
+        target_x = calculate_X (target_y, *currOrientation, *bub_x, *bub_y) ;
     }
     else {
         if (*currOrientation > 22) {
-            int x_target, dx, y_target ;
-            x_target = BOARD_RIGHT - BUB_SIZE ;
-            dx = abs (BOARD_RIGHT - bubPosition -> x) ;
 
-            y_target = calculate_Y(dx, *currOrientation) ;
 
-            bubPosition -> x = x_target ;
-            bubPosition -> y -= y_target ;
+            target_x = *bub_x + VELOCITY ;
+
+            target_y = calculate_Y(target_x, *currOrientation, *bub_x, *bub_y) ;
         }
         else {
-            int x_target, dx, y_target ;
-            x_target = BOARD_LEFT ;
-            dx = abs (BOARD_LEFT - bubPosition -> x) ;
 
-            y_target = calculate_Y(dx, *currOrientation) ;
+            target_x = *bub_x - VELOCITY ;
 
-            bubPosition -> x = x_target ;
-            bubPosition -> y -= y_target ;
+            target_y = calculate_Y(target_x, *currOrientation, *bub_x, *bub_y) ;
         }
     }
 
-    *bubMoving = false ;
+    /* check if new coordinates are within window */
+    if ((target_x <= BOARD_RIGHT - BUB_SIZE) && (target_x >= BOARD_LEFT) && (target_y >= BOARD_TOP)) {
+
+        *bub_x = target_x ;
+        *bub_y = target_y ;
+
+        bubPosition -> x = *bub_x ;
+        bubPosition -> y = *bub_y ;
+    }
+    else {
+        *bubMoving = false ;
+    }
+
+
+
 }
 
 
@@ -223,6 +256,9 @@ int main(int argc, char* argv[])
     /* 0 = pointing left, 22 = upwards, 45 = right*/
     int currentOrientation = 22 ;
 
+    /* real coordinates of bubble */
+    double bub_x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+    double bub_y = BUB_START_Y ;
 
     /* Is the bubble being launched? */
     bool bubLaunching ;
@@ -231,6 +267,8 @@ int main(int argc, char* argv[])
     /* Is the bubble moving?*/
     bool bubMoving ;
     bubMoving = false ;
+
+
 
     bool testBool ;
 
@@ -305,6 +343,9 @@ int main(int argc, char* argv[])
     bubPosition.x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
     bubPosition.y = BUB_START_Y ;
 
+    bub_x = (double) bubPosition.x ;
+    bub_y = (double) bubPosition.y ;
+
     int gameover = 0;
 
     /* main loop: check events and re-draw the window until the end */
@@ -322,18 +363,18 @@ int main(int argc, char* argv[])
         /* if bubble is moving we move it */
 
         if (bubLaunching) {
-            launchBub (&bubPosition, &bubLaunching, &bubMoving) ;
+            launchBub (&bubPosition, &bubLaunching, &bubMoving, &bub_x, &bub_y) ;
         }
 
 
         if (bubMoving) {
-            moveBub(&bubPosition, &bubMoving, &currentOrientation) ;
+            moveBub(&bubPosition, &bubMoving, &currentOrientation, &bub_x, &bub_y) ;
         }
 
 
 
         /* calculation of currentAngle*/
-        currentAngle = calculateAngle (currentOrientation) ;
+        //currentAngle = calculateAngle (currentOrientation) ;
 
         // draw the cache
         SDL_FillRect(screen, &cache, color) ;
