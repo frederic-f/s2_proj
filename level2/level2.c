@@ -62,14 +62,15 @@ void sp () {
  * launcher vertical => angle = PI /2 (~1.57)
  * launcher at extreme right/left => angle = (0.13) */
 
-double calculateAngle (int currOrientation) {
+double calculateAngle (int currOrientation) { 
 
     double angularDistance = PI / LAUNCHER_DIV ;
 
     /* range of angle is always bewteen 0
      * or more accurately between 2* PI/LAUNCHER_DIV and PI/2 */
     double angle = (PI / 2) - ( fabs (22 - currOrientation) * angularDistance ) ;
-
+    
+    // double angle = (PI) - (  currOrientation * angularDistance ) ;
     return angle ;
 
 }
@@ -85,8 +86,12 @@ double calculate_Y (double target_x, int orientation, double bub_x, double bub_y
     double angle = calculateAngle(orientation);
 
     dy = dx * ((sin(angle) / cos(angle)));
+ 
+    
+    double returnval ;
+    returnval = bub_y - dy ;
 
-    return bub_y - dy ;
+    return returnval ;
 }
 
 /* function that calculate the X position of bubble
@@ -178,6 +183,7 @@ void HandleEvent(SDL_Event event,
 
 void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving, double *bub_x, double *bub_y)
 {
+	
     /* if bub NOT on launcher and NOT moving
      * then return it to launcher */
     if (bubPosition -> y != BUB_START_Y) {
@@ -205,7 +211,7 @@ void moveBub (SDL_Rect *bubPosition, bool *bubMoving, int *currOrientation, doub
 {
 
     /* temp variables */
-    int target_x, target_y ;
+    double target_x, target_y ;
 
 
     if (*currOrientation == 22) {
@@ -257,7 +263,7 @@ int main(int argc, char* argv[])
     int currentOrientation = 22 ;
 
     /* real coordinates of bubble */
-    double bub_x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+    double bub_x = SCREEN_WIDTH / 2. - BUB_SIZE / 2. - 1;
     double bub_y = BUB_START_Y ;
 
     /* Is the bubble being launched? */
@@ -285,7 +291,7 @@ int main(int argc, char* argv[])
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     /* set keyboard repeat */
-    SDL_EnableKeyRepeat(10, 10);
+    SDL_EnableKeyRepeat(10, 50);
 
     /* load frame */
     temp  = SDL_LoadBMP("frame_1p.bmp");
@@ -340,7 +346,7 @@ int main(int argc, char* argv[])
     SDL_Rect bubPosition ;
 
     /* set sprite BUBBLE position initialy on top of launcher */
-    bubPosition.x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+    bubPosition.x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1 ;
     bubPosition.y = BUB_START_Y ;
 
     bub_x = (double) bubPosition.x ;
@@ -371,7 +377,7 @@ int main(int argc, char* argv[])
             moveBub(&bubPosition, &bubMoving, &currentOrientation, &bub_x, &bub_y) ;
         }
 
-
+	//printf ("%f", bub_x) ;
 
         /* calculation of currentAngle*/
         //currentAngle = calculateAngle (currentOrientation) ;
