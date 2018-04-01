@@ -183,26 +183,35 @@ void HandleEvent(SDL_Event event,
 
 void launchBub (SDL_Rect * bubPosition, bool *bubLaunching, bool *bubMoving, double *bub_x, double *bub_y)
 {
-	
-    /* if bub NOT on launcher and NOT moving
-     * then return it to launcher */
-    if (bubPosition -> y != BUB_START_Y) {
 
-        /* return bubble to launcher */
-        bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
-        bubPosition -> y = BUB_START_Y ;
 
-        *bub_x = bubPosition -> x ;
-        *bub_y = bubPosition -> y ;
+    /* launching only if bubble not moving*/
+    if (!*bubMoving) {
 
+        /* if bub NOT on launcher
+        * then return it to launcher */
+        if (bubPosition -> y != BUB_START_Y) {
+
+            /* return bubble to launcher */
+            bubPosition -> x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+            bubPosition -> y = BUB_START_Y ;
+
+            *bub_x = bubPosition -> x ;
+            *bub_y = bubPosition -> y ;
+
+        }
+        else {
+
+            /* Bub is ON LAUNCHER
+            * bubble starts moving from launcher*/
+            *bubMoving = true ;
+        }
+
+        /* in all cases, launching is finished */
+        *bubLaunching = false ;
     }
-    else {
-        /* bubble starts moving from launcher*/
-        *bubMoving = true ;
-    }
 
-    /* in all cases, launching is finished */
-    *bubLaunching = false ;
+
 }
 
 
@@ -235,7 +244,15 @@ void moveBub (SDL_Rect *bubPosition, bool *bubMoving, int *currOrientation, doub
     }
 
     /* check if new coordinates are within window */
-    if ((target_x <= BOARD_RIGHT - BUB_SIZE) && (target_x >= BOARD_LEFT) && (target_y >= BOARD_TOP)) {
+
+    if ((target_x <= BOARD_RIGHT - BUB_SIZE) && (target_x >= BOARD_LEFT) ) {
+
+        if (target_y <= BOARD_TOP) {
+            target_y = BOARD_TOP ;
+
+            *bubMoving = false ;
+
+        }
 
         *bub_x = target_x ;
         *bub_y = target_y ;
