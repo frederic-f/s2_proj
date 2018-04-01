@@ -28,6 +28,16 @@
 #define VELOCITY          1  // bubble velocity
 
 
+
+
+typedef struct
+{
+    char key[SDLK_LAST] ;
+} Input ;
+
+
+
+
 /* DEBUGGING FUNCTIONS
  * Simulate events */
 void la () {
