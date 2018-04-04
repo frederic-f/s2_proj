@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "bub.h"
+
 
 /* Size of the window */
 #define SCREEN_WIDTH      720
@@ -30,10 +32,7 @@
 
 
 
-typedef struct
-{
-    char key[SDLK_LAST] ;
-} Input ;
+
 
 
 
@@ -318,7 +317,7 @@ int main(int argc, char* argv[])
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     /* set keyboard repeat */
-    SDL_EnableKeyRepeat(10, 10);
+    SDL_EnableKeyRepeat(10, 30);
 
     /* load frame */
     temp  = SDL_LoadBMP("frame_1p.bmp");
