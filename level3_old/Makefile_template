@@ -1,0 +1,32 @@
+## Exemple de Makefile avec macros
+
+# definition du compilateur
+CC = gcc
+
+# definition des options de compilation pour obtenir un fichier .o
+PRODUCTFLAGS = -Wall -Wextra -pedantic -std=c99 -c -O3
+
+# definition des options de compilation pour obtenir un fichier .do
+DEBUGFLAGS = -Wall -Wextra -pedantic -std=c99 -g -c
+
+# Fichier executable test
+test_list: test_list.o int_list.o
+        $(CC) -o test_list test_list.o int_list.o
+
+test_list.o: test_list.c int_list.h
+        $(CC) $(PRODUCTFLAGS) test_list.c
+
+int_list.o: int_list.c int_list.h
+        $(CC) $(PRODUCTFLAGS) int_list.c
+
+# Fichier executable pour le debuggage test.db
+test_list.db: test_list.do int_list.do
+        $(CC) -o test_list.db test_list.do int_list.do
+test_list.do: test_list.c int_list.h
+        $(CC) -o test_list.do $(DEBUGFLAGS) test_list.c
+int_list.do: int_list.c int_list.h
+        $(CC) -o int_list.do $(DEBUGFLAGS) int_list.c
+
+clean:
+        rm -f test_list test_list.db *.o *.do
+
