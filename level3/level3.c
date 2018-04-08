@@ -4,64 +4,34 @@
 #include <stdbool.h>
 
 #include "bub.h"
+#include "game.h"
 
-#define SCREEN_WIDTH      720
-#define SCREEN_HEIGHT     540
+#define SCREEN_WIDTH        720
+#define SCREEN_HEIGHT       540
 
-#define LAUNCHER_WIDTH    187
-#define LAUNCHER_HEIGHT   157
-#define LAUNCHER_CENTER   94
+#define LAUNCHER_WIDTH      187
+#define LAUNCHER_HEIGHT     157
+#define LAUNCHER_CENTER     94
+
+#define BUB_NX              8       // max number of bubs in hrztl direction
+#define BUB_NY              11      // vrtcl
 
 
-void HandleEvent(SDL_Event event,
-        int * quit, int * currOrientation, bub_t * bub_t_ptr)
-{
-    switch (event.type) {
-        /* close button clicked */
-        case SDL_QUIT:
-            *quit = 1;
-            break;
 
-        case SDL_KEYUP:
-            switch (event.key.keysym.sym) {
-                case SDLK_SPACE:
 
-                    if(!bub_t_ptr->isLaunching) {
-                        bub_t_ptr->isLaunching = true ;
-                    }
+SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dum) {
 
-                    break ;
+    /* distance between each bub */
+    int d_x = (BOARD_RIGHT - BOARD_LEFT) / 8;
 
-                default:
-                    break;
-            }
-            break;
+    /* there are 8 bubs on even rows
+     * there are 7 bubs on odd rows
+     * for odd rows (2d option of ternary op) we add a shift to the right */
+    dum->x = (i % 2 == 0) ? BOARD_LEFT + j*d_x : BOARD_LEFT + j*d_x + BUB_SIZE / 2;
 
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                    *quit = 1;
-                    break;
-                case SDLK_LEFT:
+    dum->y = BOARD_TOP + (BUB_SIZE * i) ;
 
-                    /* launcher rotates to the left, unless already at extreme left */
-                    if (*currOrientation > 0) {
-                        *currOrientation -= 1 ;
-                    }
-                    break;
-                case SDLK_RIGHT:
-                    // launcher rotates to the right, unless already at far right
-                    if (*currOrientation < 44) {
-                        *currOrientation += 1 ;
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-    }
+    return dum ;
 }
 
 
@@ -87,18 +57,39 @@ int main(int argc, char* argv[])
     SDL_EnableKeyRepeat(10, 30);
 
 
-
     /* ****************************************************************************************************************
     * BUB initialization
     * ************************************************************************************************************** */
 
-    /* create struct Bub_t object and pointer to it => from now on, bub_t is only accessed via the _ptr
+    /*
+     * create struct Bub_t object and pointer to it => from now on, bub_t is only accessed via the _ptr
      * */
     struct Bub_t bub_t, * bub_t_ptr ;
 
     bub_t_ptr = &bub_t ;
 
     bub_init (bub_t_ptr) ;
+
+
+    /*
+     * non-moving bubs are kept track of in a pointer-style 2-dimension array
+     * */
+    int * * bubs_array = (int * *) malloc (BUB_NY * sizeof(int *)) ;
+
+    int i, j ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        bubs_array[i] = (int *) malloc (BUB_NX * sizeof(int)) ;
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? 1 : 0 ;
+        }
+    }
 
 
 
@@ -125,7 +116,7 @@ int main(int argc, char* argv[])
     bub_t_ptr->sprite_ptr = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
 
-    /* creation of a cache to hide the launcher sprite */
+    /* creation of a CACHE to hide the launcher sprite */
     SDL_Rect cache ;
     cache.x = 0 ;
     cache.y = 0 ;
@@ -148,16 +139,16 @@ int main(int argc, char* argv[])
     SDL_SetColorKey(launcher_srf_ptr, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
 
-    /* setup BUBSPRITE colorkey and turn on RLE */
+    /* BUB transparency*/
     SDL_SetColorKey(bub_t_ptr->sprite_ptr, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
 
     /* Rectangle to store the position of the sprite in the window. */
-    SDL_Rect spritePosition;
+    SDL_Rect launcherPos_rect;
 
     /* set sprite LAUNCHER position in the bottoom of the window */
-    spritePosition.x = (SCREEN_WIDTH - LAUNCHER_WIDTH) / 2; // in the middle of the window in WIDTH
-    spritePosition.y = SCREEN_HEIGHT - LAUNCHER_HEIGHT ; // at the bottom in HEIGHT
+    launcherPos_rect.x = (SCREEN_WIDTH - LAUNCHER_WIDTH) / 2; // in the middle of the window in WIDTH
+    launcherPos_rect.y = SCREEN_HEIGHT - LAUNCHER_HEIGHT ; // at the bottom in HEIGHT
 
 
     int gameover = 0;
@@ -203,22 +194,58 @@ int main(int argc, char* argv[])
 
 
         // draw the sprit LAUNCHER
-        SDL_Rect spriteImage ;
-        spriteImage.w = LAUNCHER_WIDTH ;
-        spriteImage.h = LAUNCHER_HEIGHT ;
-        spriteImage.x = 0 ; // the image is moved in height, not in width
-        spriteImage.y = LAUNCHER_HEIGHT * currentOrientation ;
+        SDL_Rect launcherImg_rect ;
+        launcherImg_rect.w = LAUNCHER_WIDTH ;
+        launcherImg_rect.h = LAUNCHER_HEIGHT ;
+        launcherImg_rect.x = 0 ; // the image is moved in height, not in width
+        launcherImg_rect.y = LAUNCHER_HEIGHT * currentOrientation ;
 
-        SDL_BlitSurface(launcher_srf_ptr, &spriteImage, screen_srf_ptr, &spritePosition) ;
+        SDL_BlitSurface(launcher_srf_ptr, &launcherImg_rect, screen_srf_ptr, &launcherPos_rect) ;
 
-	    // draw the bubble
-	    SDL_Rect bubImage ;
-	    bubImage.w = BUB_SIZE ;
-	    bubImage.h = BUB_SIZE ;
-	    bubImage.x = 0 ;
-	    bubImage.y = 0 ;
+
+        /* used by all BUBs, moving or not
+         * */
+
+        SDL_Rect bub_rect ;
+        bub_rect.w = BUB_SIZE ;
+        bub_rect.h = BUB_SIZE ;
+        bub_rect.x = 0 ;
+        bub_rect.y = 0 ;
+
+
+
+        /* draw BUBs on TOP
+        * */
+
+        /* we use a pointer to place the non-moving bubs where they belong
+         * the same pointer is used for all non-moving bubs
+         * it is updated as we parse through the array of non-moving bubs
+         * */
+        SDL_Rect dummy_rect, * dum ;
+        dum = &dummy_rect;
+
+        /* parsing the array of non-moving bubs : i=rows, j=cols */
+        for (i = 0 ; i < BUB_NY ; i += 1) {
+
+            for (j = 0 ; j < BUB_NX ; j +=1 ) {
+
+                /* process only the bubs set to 1 */
+                if (bubs_array[i][j] == 1) {
+
+                    /* update the position of the bub to display */
+                    dum = getBubPositionRect(i, j, dum);
+
+                    /* display */
+                    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, screen_srf_ptr, dum);
+                }
+            }
+        }
+
+
+        /*  draw bub MOVING
+         * */
 	
-	    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bubImage, screen_srf_ptr, &(bub_t_ptr->position)) ;
+	    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, screen_srf_ptr, &(bub_t_ptr->position)) ;
 
 
         /* update the screen */

@@ -52,4 +52,6 @@ void bub_getOnLauncher (bub_t * bub_t_ptr) ;
 
 void bub_move (bub_t * bub_t_ptr) ;
 
+void bub_placeOnTop(bub_t * bub_t_ptr) ;
+
 #endif

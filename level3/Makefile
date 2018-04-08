@@ -1,9 +1,11 @@
 SRC=level3.c
-HDR=bub.h
-FCT=bub.c
+BUBh=bub.h
+BUBc=bub.c
+GAMh=game.h
+GAMc=game.c
 BIN=main
 
-$(BIN): $(SRC) $(HDR) $(FCT) ; gcc -Wall -g -std=c99 $(SRC) $(HDR) $(FCT) `sdl-config --cflags --libs` -o $(BIN) -lm
+$(BIN): $(SRC) $(BUBh) $(BUBc) $(GAMh) $(GAMc) ; gcc -Wall -g -std=c99 $(SRC) $(BUBh) $(BUBc) $(GAMh) $(GAMc) `sdl-config --cflags --libs` -o $(BIN) -lm
 
 clean: rm -f $(BIN)
 

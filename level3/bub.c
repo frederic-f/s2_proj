@@ -50,7 +50,6 @@ void bub_launch (bub_t * bub_t_ptr, int *currOrientation) {
             bub_getOnLauncher(bub_t_ptr) ;
 
         } else {
-
             /* Bub is ON LAUNCHER
             * bubble starts moving from launcher*/
 
@@ -82,10 +81,7 @@ void bub_launch (bub_t * bub_t_ptr, int *currOrientation) {
             bub_t_ptr->step_y = sin(theta) * VELOCITY ;
             //printf ("%f\n", step_y) ;
 
-
-
-
-            /* then launching the bub */
+            /* launching the bub */
             bub_t_ptr->isMoving = true;
         }
 
@@ -112,26 +108,44 @@ void bub_move (bub_t * bub_t_ptr)
      * if bub within window : bub keeps moving -> coord are updated
      * if not : bub stop
      * */
-    if ((target_pos_x >= BOARD_LEFT) && (target_pos_x <= BOARD_RIGHT - BUB_SIZE)) {
-        // if for Y
-        if (target_pos_y <= BOARD_TOP) { // it went across board in Y
-            target_pos_y = BOARD_TOP ;
-            bub_t_ptr->isMoving = false ;
-        }
 
-        // bub still in window
+    /* 1. STOP on TOP
+     * */
+    if (target_pos_y <= BOARD_TOP) { // it went across board in Y
+        target_pos_y = BOARD_TOP ;
+        bub_t_ptr->isMoving = false ;
+    }
+    /* 2 REBOUND left*/
+    else if (target_pos_x <= BOARD_LEFT) {
+
+        /* recalculate tar_pos_x according to formula : x = x + 2d, with d = B_L -x */
+        target_pos_x = 2 * BOARD_LEFT - target_pos_x ;
+
+        /* change direction of motion */
+        bub_t_ptr->step_x *= -1 ;
+    }
+    /* 3. REBOUND RIGHT*/
+    else if (target_pos_x >= BOARD_RIGHT - BUB_SIZE) {
+
+        /* recalculate tar_pos_x according to formula : x = x + B_S - 2d, with d = B_R + x + B_Size */
+        target_pos_x = target_pos_x + (2 * BOARD_RIGHT) + (2 * BUB_SIZE)  ;
+
+        /* change direction of motion */
+        bub_t_ptr->step_x *= -1 ;
+    }
+    /* 4. NORMAL ROUTE*/
+    else {
 
         bub_t_ptr->x = target_pos_x ;
         bub_t_ptr->y = target_pos_y ;
 
         bub_t_ptr->position.x = (int) bub_t_ptr->x ;
         bub_t_ptr->position.y = (int) bub_t_ptr->y ;
-
-    }
-    else {
-        // bubble not in window in X
-        bub_t_ptr->isMoving = false ;
     }
 
+
+}
+
+void bub_placeOnTop(bub_t * bub_t_ptr) {
 
 }
