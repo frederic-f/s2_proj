@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -113,9 +114,10 @@ void bub_move (bub_t * bub_t_ptr)
      * */
     if (target_pos_y <= BOARD_TOP) { // it went across board in Y
         target_pos_y = BOARD_TOP ;
+
         bub_t_ptr->isMoving = false ;
     }
-    /* 2 REBOUND left*/
+    /* 2 REBOUND left */
     else if (target_pos_x <= BOARD_LEFT) {
 
         /* recalculate tar_pos_x according to formula : x = x + 2d, with d = B_L -x */
@@ -146,6 +148,46 @@ void bub_move (bub_t * bub_t_ptr)
 
 }
 
-void bub_placeOnTop(bub_t * bub_t_ptr) {
+void bub_place(bub_t * bub_t_ptr, int ** bubs_array) {
 
+    //printf ("placeing bub !\n") ;
+
+    /* row_num depends on Y
+     * for now we suppose it reaches the BOARD_TOP */
+    int row_num = 0 ;
+
+    /* calculate the width taken by a bubble */
+    int bub_width = (BOARD_RIGHT - BOARD_LEFT) / BUB_NX ;
+
+    //printf ("bub_width = %d\n", bub_width) ;
+
+    /* number of bubs on this row */
+    short num_bubs = (row_num % 2 == 0) ? 8 : 7 ;
+
+    //printf ("num_bubs = %d\n", num_bubs) ;
+
+    short j, place_pos = -1 ;
+
+    /* the reference x is the middle of the bub */
+    double x = bub_t_ptr-> x + BUB_SIZE / 2 ;
+
+    //printf ("x = %f\n", x) ;
+
+    for (j = 0; j < num_bubs ; j += 1) {
+
+        short left = BOARD_LEFT + bub_width*(j) ;
+        short right = BOARD_LEFT + bub_width*(j+1) ;
+
+        /* we check if our moving bubble just stopped between left and right x */
+        if ((x >= left) && (x < right)) {
+
+            place_pos = j ;
+            break ;
+        }
+    }
+
+    //printf("placing bub in %d\n", place_pos) ;
+
+    /* let's update bubs_array */
+    bubs_array[row_num][place_pos] = 1 ;
 }

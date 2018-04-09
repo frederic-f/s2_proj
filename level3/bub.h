@@ -2,8 +2,10 @@
 #define S2_PROJ_BUB_H
 
 #include <SDL.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -19,6 +21,9 @@
 #define VELOCITY          1  // bubble velocity
 #define BUB_SIZE          40 // horizontal and vertical size
 #define BUB_START_Y       457
+
+#define BUB_NX              8       // max number of bubs in hrztl direction
+#define BUB_NY              11      // vrtcl
 
 
 
@@ -52,6 +57,9 @@ void bub_getOnLauncher (bub_t * bub_t_ptr) ;
 
 void bub_move (bub_t * bub_t_ptr) ;
 
-void bub_placeOnTop(bub_t * bub_t_ptr) ;
+void bub_place (bub_t * bub_t_ptr,int ** bubs_array) ;
+
+
+void fatal (char *message) ;
 
 #endif

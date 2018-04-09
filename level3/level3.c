@@ -13,13 +13,12 @@
 #define LAUNCHER_HEIGHT     157
 #define LAUNCHER_CENTER     94
 
-#define BUB_NX              8       // max number of bubs in hrztl direction
-#define BUB_NY              11      // vrtcl
 
 
 
 
-SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dum) {
+
+SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
 
     /* distance between each bub */
     int d_x = (BOARD_RIGHT - BOARD_LEFT) / 8;
@@ -27,11 +26,11 @@ SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dum) {
     /* there are 8 bubs on even rows
      * there are 7 bubs on odd rows
      * for odd rows (2d option of ternary op) we add a shift to the right */
-    dum->x = (i % 2 == 0) ? BOARD_LEFT + j*d_x : BOARD_LEFT + j*d_x + BUB_SIZE / 2;
+    dumRect_ptr->x = (i % 2 == 0) ? BOARD_LEFT + j*d_x : BOARD_LEFT + j*d_x + BUB_SIZE / 2;
 
-    dum->y = BOARD_TOP + (BUB_SIZE * i) ;
+    dumRect_ptr->y = BOARD_TOP + (BUB_SIZE * i) ;
 
-    return dum ;
+    return dumRect_ptr ;
 }
 
 
@@ -87,7 +86,8 @@ int main(int argc, char* argv[])
 
         for (j = 0 ; j < j_max ; j +=1 ) {
 
-            bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? 1 : 0 ;
+            //bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? 1 : 0 ;
+            bubs_array[i][j] = 0 ;
         }
     }
 
@@ -171,8 +171,25 @@ int main(int argc, char* argv[])
         if (bub_t_ptr->isLaunching)
             bub_launch (bub_t_ptr, &currentOrientation) ;
 
-        if (bub_t_ptr->isMoving)
+        /* if bub IS MOVING */
+        if (bub_t_ptr->isMoving) {
+
+            /* try to move bub */
             bub_move (bub_t_ptr) ;
+
+            /* if it stopped moving (reach top or other bub)
+             * ==> we PLACE it */
+            if (!bub_t_ptr->isMoving) {
+
+                /* place the new bub into non-moving bubs_array */
+                bub_place(bub_t_ptr, bubs_array);
+
+                /* return bub to luncher */
+                bub_getOnLauncher(bub_t_ptr);
+            }
+
+        }
+
 
         /* *********************
          * DRAWING
@@ -214,15 +231,16 @@ int main(int argc, char* argv[])
 
 
 
-        /* draw BUBs on TOP
+        /* draw BUBs on TO        if (!bub_placeOnTop (bub_t_ptr))
+            fatal("Placement on top") ;P
         * */
 
         /* we use a pointer to place the non-moving bubs where they belong
          * the same pointer is used for all non-moving bubs
          * it is updated as we parse through the array of non-moving bubs
          * */
-        SDL_Rect dummy_rect, * dum ;
-        dum = &dummy_rect;
+        SDL_Rect dummy_rect, * dumRect_ptr ;
+        dumRect_ptr = &dummy_rect;
 
         /* parsing the array of non-moving bubs : i=rows, j=cols */
         for (i = 0 ; i < BUB_NY ; i += 1) {
@@ -233,10 +251,10 @@ int main(int argc, char* argv[])
                 if (bubs_array[i][j] == 1) {
 
                     /* update the position of the bub to display */
-                    dum = getBubPositionRect(i, j, dum);
+                    dumRect_ptr = getBubPositionRect(i, j, dumRect_ptr);
 
                     /* display */
-                    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, screen_srf_ptr, dum);
+                    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, screen_srf_ptr, dumRect_ptr);
                 }
             }
         }

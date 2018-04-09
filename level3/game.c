@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -57,3 +58,11 @@ void HandleEvent(SDL_Event event,
 
 
 
+void fatal (char *message) {
+    char error_message[100] ;
+
+    strcpy (error_message, "[!!] Fatal Error\n") ;
+    strncat (error_message, message, 83) ;
+    perror (error_message) ;
+    //exit (-1) ;
+}
