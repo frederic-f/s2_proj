@@ -3,35 +3,10 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "constants.h"
 #include "bub.h"
 #include "game.h"
 
-#define SCREEN_WIDTH        720
-#define SCREEN_HEIGHT       540
-
-#define LAUNCHER_WIDTH      187
-#define LAUNCHER_HEIGHT     157
-#define LAUNCHER_CENTER     94
-
-
-
-
-
-
-SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
-
-    /* distance between each bub */
-    int d_x = (BOARD_RIGHT - BOARD_LEFT) / 8;
-
-    /* there are 8 bubs on even rows
-     * there are 7 bubs on odd rows
-     * for odd rows (2d option of ternary op) we add a shift to the right */
-    dumRect_ptr->x = (i % 2 == 0) ? BOARD_LEFT + j*d_x : BOARD_LEFT + j*d_x + BUB_SIZE / 2;
-
-    dumRect_ptr->y = BOARD_TOP + (35 * i) ;
-
-    return dumRect_ptr ;
-}
 
 
 
@@ -70,10 +45,18 @@ int main(int argc, char* argv[])
     bub_init (bub_t_ptr) ;
 
 
-    /*
-     * non-moving bubs are kept track of in a pointer-style 2-dimension array
-     * */
+    /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
     int * * bubs_array = (int * *) malloc (BUB_NY * sizeof(int *)) ;
+
+    /* non-moving bubs /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
+    int * * * bub_array_centers = (int * * *) malloc (BUB_NY * sizeof(int * *)) ;
+
+    /* TODO make those two arrays a single one ? */
+
+    SDL_Rect * rectForCenters_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
+
+    //SDL_Rect rectForCenters_rect, * rectForCenters_ptr ;
+    //rectForCenters_ptr = &rectForCenters_rect;
 
     int i, j ;
 
@@ -81,16 +64,33 @@ int main(int argc, char* argv[])
 
         bubs_array[i] = (int *) malloc (BUB_NX * sizeof(int)) ;
 
+        bub_array_centers[i] = (int * *) malloc (BUB_NX * sizeof(int *)) ;
+
         /* number of bubs in a row depends on odd/even number of row */
         int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
 
         for (j = 0 ; j < j_max ; j +=1 ) {
 
+            /* array presence */
+            /* set whole lines of bubs here if you want to test */
             //bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? 1 : 0 ;
-            bubs_array[i][j] = 1 ;
+            bubs_array[i][j] = 0 ;
+
+            /* array centers */
+            bub_array_centers[i][j] = (int *) malloc (2 * sizeof(int)) ;
+
+            /* we use the function to get coords of TOP LEFT corner */
+            rectForCenters_ptr = getBubPositionRect(i, j, rectForCenters_ptr) ;
+
+
+            /* and add BUB_SIZE/2 to get coords of centers */
+            bub_array_centers[i][j][0] = rectForCenters_ptr->x + BUB_SIZE/2 ;
+            bub_array_centers[i][j][1] = rectForCenters_ptr->y + BUB_SIZE/2 ;
         }
     }
 
+    //printf("lets looks %d\n", bub_array_centers[0][0][0]) ;
+    //printf("lets looks %d\n", bub_array_centers[0][0][1]) ;
 
 
     /* Information about the current situation of the launcher sprite */
@@ -173,9 +173,9 @@ int main(int argc, char* argv[])
         if (bub_t_ptr->isMoving) {
 
             /* try to move bub */
-            bub_move (bub_t_ptr) ;
+            bub_move (bub_t_ptr, bubs_array, bub_array_centers) ;
 
-            /* if it stopped moving (reach top or other bub)
+            /* if it stopped moving (reach TOP or COLLISION)
              * ==> we PLACE it */
             if (!bub_t_ptr->isMoving) {
 

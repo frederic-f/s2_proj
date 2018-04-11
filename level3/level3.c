@@ -17,7 +17,8 @@
 
 
 
-
+/* . function that returns a Rect object with x and y coordinates set according to i and j indexes
+ * . used to */
 SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
 
     /* distance between each bub */

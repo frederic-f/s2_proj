@@ -6,13 +6,14 @@
 #include <math.h>
 #include <stdbool.h>
 
+#include "constants.h"
 #include "bub.h"
 
 
 
 void bub_init (bub_t * bub_t_ptr) {
 
-    SDL_Surface *temp, *bmp ;    
+    SDL_Surface *temp ;
  
     /* SDL_Surface array for color random pickup */
     //SDL_Surface * bmps[]
@@ -105,32 +106,32 @@ void bub_launch (bub_t * bub_t_ptr, int *currOrientation) {
 
 }
 
-void bub_move (bub_t * bub_t_ptr)
+void bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
 {
 
-    /* target_pos x and y
-     * */
+    /* target_pos x and y */
     double target_pos_x = bub_t_ptr->x + bub_t_ptr->step_x ;
     double target_pos_y = bub_t_ptr->y - bub_t_ptr->step_y ;
     //printf ("%f\n", target_pos_y) ;
 
+    /* now we check the different scenarios : collision, hit top, hit borders, ...*/
 
-    /* check if target_pos is within window
-     * first with X coordinates
-     * second with Y coord
-     *
-     * if bub within window : bub keeps moving -> coord are updated
-     * if not : bub stop
-     * */
+    /* 1. COLLISION */
+    if (bub_isColliding (bub_t_ptr, bubs_array, bub_array_centers)) {
 
-    /* 1. STOP on TOP
-     * */
-    if (target_pos_y <= BOARD_TOP) { // it went across board in Y
+        printf ("paf\n") ;
+
+        bub_t_ptr->isMoving = false ;
+    }
+
+    /* 2. hit TOP */
+    else if (target_pos_y <= BOARD_TOP) { // it went across board in Y
         target_pos_y = BOARD_TOP ;
 
         bub_t_ptr->isMoving = false ;
     }
-    /* 2 REBOUND left */
+
+    /* 3. REBOUND left */
     else if (target_pos_x <= BOARD_LEFT) {
 
         /* recalculate tar_pos_x according to formula : x = x + 2d, with d = B_L -x */
@@ -139,7 +140,8 @@ void bub_move (bub_t * bub_t_ptr)
         /* change direction of motion */
         bub_t_ptr->step_x *= -1 ;
     }
-    /* 3. REBOUND RIGHT*/
+
+    /* 4. REBOUND RIGHT*/
     else if (target_pos_x >= BOARD_RIGHT - BUB_SIZE) {
 
         /* recalculate tar_pos_x according to formula : x = x + B_S - 2d, with d = B_R + x + B_Size */
@@ -148,7 +150,8 @@ void bub_move (bub_t * bub_t_ptr)
         /* change direction of motion */
         bub_t_ptr->step_x *= -1 ;
     }
-    /* 4. NORMAL ROUTE*/
+
+    /* 5. NORMAL ROUTE*/
     else {
 
         bub_t_ptr->x = target_pos_x ;
@@ -162,6 +165,7 @@ void bub_move (bub_t * bub_t_ptr)
 }
 
 void bub_place(bub_t * bub_t_ptr, int ** bubs_array) {
+
 
     //printf ("placeing bub !\n") ;
 
@@ -203,4 +207,48 @@ void bub_place(bub_t * bub_t_ptr, int ** bubs_array) {
 
     /* let's update bubs_array */
     bubs_array[row_num][place_pos] = 1 ;
+}
+
+bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) {
+
+    /* loop through non-moving bubs */
+    short i, j, j_max ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        j_max = (i % 2 == 0) ? 7 : 8 ;
+
+        for (j = 0 ; j < j_max ; j += 1) {
+
+            /* if there is a bub at this position */
+            if (bubs_array[i][j]) {
+
+                float x_myBub = bub_t_ptr->x ;
+                float y_myBub = bub_t_ptr->y ;
+
+                float x_otherBub = bub_array_centers[i][j][0] ;
+                float y_otherBub = bub_array_centers[i][j][1] ;
+
+                /* see if there is a collision */
+                float dist_between_centers = bub_getDistanceBetweenTwoBubs(x_myBub, y_myBub, x_otherBub, y_otherBub) ;
+
+                float collison_dist = BUB_SIZE / 2. ;
+
+                if (dist_between_centers <= collison_dist) {
+                    return true ;
+                }
+            }
+        }
+    }
+
+    return false ;
+
+}
+
+float bub_getDistanceBetweenTwoBubs (float bub1_x, float bub1_y, float bub2_x, float bub2_y) {
+
+    float dx = bub1_x - bub2_x ;
+    float dy = bub1_y - bub2_y ;
+
+    return sqrt (pow (dx, 2) + pow (dy, 2)) ;
 }

@@ -10,22 +10,7 @@
 #include <stdbool.h>
 
 
-#define BOARD_LEFT        200
-#define BOARD_RIGHT       520
-#define BOARD_TOP         31
-
-/* In the sprite, we have 45 images of a 187x157 picture */
-#define LAUNCHER_DIV      48 // PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations
-#define PI 3.14159265359
-
-#define VELOCITY          1  // bubble velocity
-#define BUB_SIZE          40 // horizontal and vertical size
-#define BUB_START_Y       457
-
-#define BUB_NX              8       // max number of bubs in hrztl direction
-#define BUB_NY              11      // vrtcl
-
-#define NUM_COLOR	  8           
+#include "constants.h"
 
 
 
@@ -59,10 +44,13 @@ void bub_launch (bub_t * bub_t_ptr, int * currOrientation) ;
 
 void bub_getOnLauncher (bub_t * bub_t_ptr) ;
 
-void bub_move (bub_t * bub_t_ptr) ;
+void bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
 
 void bub_place (bub_t * bub_t_ptr,int ** bubs_array) ;
 
+bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
+
+float bub_getDistanceBetweenTwoBubs (float bub1_x, float bub1_y, float bub2_x, float bub2_y) ;
 
 void fatal (char *message) ;
 
