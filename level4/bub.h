@@ -44,13 +44,13 @@ void bub_launch (bub_t * bub_t_ptr, int * currOrientation) ;
 
 void bub_getOnLauncher (bub_t * bub_t_ptr) ;
 
-void bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
+bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
 
-void bub_place (bub_t * bub_t_ptr,int ** bubs_array) ;
+bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
 
-bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
+bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers, double *target_pos_x, double *target_pos_y) ;
 
-float bub_getDistanceBetweenTwoBubs (float bub1_x, float bub1_y, float bub2_x, float bub2_y) ;
+double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) ;
 
 void fatal (char *message) ;
 

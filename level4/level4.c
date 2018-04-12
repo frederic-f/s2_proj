@@ -12,6 +12,8 @@
 
 int main(int argc, char* argv[])
 {
+    bool debug = true ;
+
     SDL_Surface *screen_srf_ptr, *temp, *launcher_srf_ptr, *frame_srf_ptr;
 
     /* ****************************************************************************************************************
@@ -48,7 +50,7 @@ int main(int argc, char* argv[])
     /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
     int * * bubs_array = (int * *) malloc (BUB_NY * sizeof(int *)) ;
 
-    /* non-moving bubs /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
+    /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
     int * * * bub_array_centers = (int * * *) malloc (BUB_NY * sizeof(int * *)) ;
 
     /* TODO make those two arrays a single one ? */
@@ -89,8 +91,10 @@ int main(int argc, char* argv[])
         }
     }
 
-    //printf("lets looks %d\n", bub_array_centers[0][0][0]) ;
-    //printf("lets looks %d\n", bub_array_centers[0][0][1]) ;
+    if (debug) {
+        printf("Check x = %d\n", bub_array_centers[1][0][0]);
+        printf("Check y = %d\n", bub_array_centers[1][0][1]);
+    }
 
 
     /* Information about the current situation of the launcher sprite */
@@ -172,20 +176,17 @@ int main(int argc, char* argv[])
         /* if bub IS MOVING */
         if (bub_t_ptr->isMoving) {
 
-            /* try to move bub */
-            bub_move (bub_t_ptr, bubs_array, bub_array_centers) ;
-
-            /* if it stopped moving (reach TOP or COLLISION)
-             * ==> we PLACE it */
-            if (!bub_t_ptr->isMoving) {
+            /* try to move bub
+             * false => collision or hit TOP => place the bub properly on grid */
+            if (!bub_move(bub_t_ptr, bubs_array, bub_array_centers)) {
 
                 /* place the new bub into non-moving bubs_array */
-                bub_place(bub_t_ptr, bubs_array);
+                bub_place(bub_t_ptr, bubs_array, bub_array_centers);
 
                 /* return bub to luncher */
                 bub_getOnLauncher(bub_t_ptr);
-            }
 
+            }
         }
 
 
