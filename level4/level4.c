@@ -3,16 +3,16 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "constants.h"
+#include "data.h"
 #include "bub.h"
 #include "game.h"
-
-
 
 
 int main(int argc, char* argv[])
 {
     bool debug = true ;
+
+    struct Game_t * game_t_ptr = (struct Game_t *) malloc (sizeof(struct Game_t)) ;
 
     SDL_Surface *screen_srf_ptr, *temp, *launcher_srf_ptr, *frame_srf_ptr;
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
     bub_t_ptr = &bub_t ;
 
-    bub_init (bub_t_ptr) ;
+    bub_init (bub_t_ptr, game_t_ptr) ;
 
 
     /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
@@ -170,21 +170,23 @@ int main(int argc, char* argv[])
          * handling the changes on BUB
          * ****************** */
 
-        if (bub_t_ptr->isLaunching)
-            bub_launch (bub_t_ptr, &currentOrientation) ;
+        if (bub_t_ptr->isLaunching) {
+
+            bub_launch (bub_t_ptr, game_t_ptr, &currentOrientation) ;
+        }
 
         /* if bub IS MOVING */
         if (bub_t_ptr->isMoving) {
 
             /* try to move bub
              * false => collision or hit TOP => place the bub properly on grid */
-            if (!bub_move(bub_t_ptr, bubs_array, bub_array_centers)) {
+            if (!bub_move (bub_t_ptr, bubs_array, bub_array_centers)) {
 
                 /* place the new bub into non-moving bubs_array */
-                bub_place(bub_t_ptr, bubs_array, bub_array_centers);
+                bub_place (bub_t_ptr, bubs_array, bub_array_centers);
 
                 /* return bub to luncher */
-                bub_getOnLauncher(bub_t_ptr);
+                bub_getOnLauncher (bub_t_ptr, game_t_ptr);
 
             }
         }

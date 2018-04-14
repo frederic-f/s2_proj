@@ -30,4 +30,39 @@
 #define NUM_COLOR	        8
 
 
+#include <SDL.h>
+#include <stdbool.h>
+
+
+struct Game_t {
+
+};
+typedef struct Game_t game_t ;
+
+
+
+struct Bub_t {
+
+    SDL_Surface * sprite_ptr ;
+
+    SDL_Rect position ; // position of the sprite on the window WE USE .x and .y only for the display
+
+    short color ;
+
+    double  x ;     // real x coordinate
+    double  y ;
+
+    int start_x ; // position on launcher
+    int start_y ;
+
+    bool isLaunching ;
+    bool isMoving ;
+
+    double step_x ;  // step of x motion
+    double step_y ;
+
+};
+typedef struct Bub_t bub_t ;
+
+
 #endif //S2_PROJ_CONSTANTS_H

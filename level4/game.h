@@ -10,13 +10,15 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "constants.h"
-#include "bub.h"
+#include "data.h"
+
+
 
 
 void HandleEvent(SDL_Event event, int * quit, int * currOrientation, bub_t * bub_t_ptr) ;
 
 SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) ;
 
+short giveRandomNumber() ;
 
 #endif //S2_PROJ_GAME_H

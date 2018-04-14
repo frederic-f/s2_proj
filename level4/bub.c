@@ -6,25 +6,50 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "constants.h"
+#include "data.h"
 #include "bub.h"
+#include "game.h"
 
 
 
-void bub_init (bub_t * bub_t_ptr) {
+void bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     SDL_Surface *temp ;
  
     /* SDL_Surface array for color random pickup */
-    //SDL_Surface * bmps[]
+    SDL_Surface * bmps[8] ;
     
     //printf ("bub_t initialised") ;
-    temp = SDL_LoadBMP("bub_blue.bmp");
-    //bmps[0] = SDL_DisplayFormat(temp) ;
-    
-    
-    //bub_t_ptr->sprite_ptr = bmps[0] ;
-    bub_t_ptr->sprite_ptr = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bub_black.bmp");
+    bmps[0] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_blue.bmp");
+    bmps[1] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_green.bmp");
+    bmps[2] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_orange.bmp");
+    bmps[3] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_purple.bmp");
+    bmps[4] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_red.bmp");
+    bmps[5] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_white.bmp");
+    bmps[6] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_yellow.bmp");
+    bmps[7] = SDL_DisplayFormat(temp) ;
+
+    /* make random choice of bub */
+
+    bub_t_ptr->color = giveRandomNumber () ;
+
+    bub_t_ptr->sprite_ptr = bmps[bub_t_ptr->color] ;
+    //bub_t_ptr->sprite_ptr = SDL_DisplayFormat(temp) ;
     
     SDL_FreeSurface(temp) ;
     
@@ -35,14 +60,17 @@ void bub_init (bub_t * bub_t_ptr) {
     bub_t_ptr->start_x = 720 / 2 - BUB_SIZE / 2 - 1;
     bub_t_ptr->start_y = BUB_START_Y;
 
-    bub_getOnLauncher(bub_t_ptr) ;
+    bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
 }
 
 
-void bub_getOnLauncher(bub_t * bub_t_ptr) {
+int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     //DBG printf ("back on launcher\n") ;
+
+    /* change bub color */
+    bub_changeColor (bub_t_ptr, game_t_ptr) ;
 
     /* return bubble to launcher */
     bub_t_ptr->position.x = bub_t_ptr->start_x;
@@ -50,10 +78,18 @@ void bub_getOnLauncher(bub_t * bub_t_ptr) {
 
     bub_t_ptr->x = bub_t_ptr->start_x;
     bub_t_ptr->y = bub_t_ptr->start_y;
+
+    return (0) ;
 }
 
+int bub_changeColor (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
-void bub_launch (bub_t * bub_t_ptr, int *currOrientation) {
+    bub_t_ptr->color = giveRandomNumber() ;
+
+    return (0) ;
+}
+
+void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
 
     /* launching only if bubble not moving*/
     if (!bub_t_ptr->isMoving) { // it is not moving
@@ -62,7 +98,7 @@ void bub_launch (bub_t * bub_t_ptr, int *currOrientation) {
         * then return it to launcher */
         if (bub_t_ptr->position.y != BUB_START_Y) {
 
-            bub_getOnLauncher(bub_t_ptr) ;
+            bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
         } else {
             /* Bub is ON LAUNCHER

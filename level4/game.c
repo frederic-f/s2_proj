@@ -5,8 +5,9 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <time.h>
 
-#include "constants.h"
+#include "data.h"
 #include "game.h"
 #include "bub.h"
 
@@ -30,7 +31,16 @@ SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
     return dumRect_ptr ;
 }
 
+short giveRandomNumber() {
 
+    time_t t ;
+
+    /* Initializes random number generator */
+    srand ((unsigned) time (&t)) ;
+
+    /* Generates numbers from 0 to 8 */
+    return rand() % 9 ;
+}
 
 void HandleEvent(SDL_Event event,
                  int * quit, int * currOrientation, bub_t * bub_t_ptr)
