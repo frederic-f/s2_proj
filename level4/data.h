@@ -36,6 +36,10 @@
 
 struct Game_t {
 
+    SDL_Surface * bubs[NUM_COLOR] ;
+
+    short gameover ;
+
 };
 typedef struct Game_t game_t ;
 

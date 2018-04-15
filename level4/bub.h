@@ -8,12 +8,11 @@
 #include <math.h>
 #include <stdbool.h>
 
-
 #include "data.h"
 
 
 
-void bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
+int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int * currOrientation) ;
 
@@ -26,6 +25,8 @@ bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) 
 bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
 
 bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers, double *target_pos_x, double *target_pos_y) ;
+
+bool bub_isBelowLimit (bub_t * bub_t_ptr) ;
 
 double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) ;
 

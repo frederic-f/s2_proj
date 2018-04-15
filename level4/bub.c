@@ -12,47 +12,17 @@
 
 
 
-void bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
+int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
-    SDL_Surface *temp ;
- 
-    /* SDL_Surface array for color random pickup */
-    SDL_Surface * bmps[8] ;
-    
-    //printf ("bub_t initialised") ;
-    temp = SDL_LoadBMP("img/bub_black.bmp");
-    bmps[0] = SDL_DisplayFormat(temp) ;
+    bool debug = true ;
 
-    temp = SDL_LoadBMP("img/bub_blue.bmp");
-    bmps[1] = SDL_DisplayFormat(temp) ;
+    if (debug)
+        printf ("bub_t initialised\n") ;
 
-    temp = SDL_LoadBMP("img/bub_green.bmp");
-    bmps[2] = SDL_DisplayFormat(temp) ;
+    bub_t_ptr->color = giveRandomNumber () + 1 ;
 
-    temp = SDL_LoadBMP("img/bub_orange.bmp");
-    bmps[3] = SDL_DisplayFormat(temp) ;
+    bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
 
-    temp = SDL_LoadBMP("img/bub_purple.bmp");
-    bmps[4] = SDL_DisplayFormat(temp) ;
-
-    temp = SDL_LoadBMP("img/bub_red.bmp");
-    bmps[5] = SDL_DisplayFormat(temp) ;
-
-    temp = SDL_LoadBMP("img/bub_white.bmp");
-    bmps[6] = SDL_DisplayFormat(temp) ;
-
-    temp = SDL_LoadBMP("img/bub_yellow.bmp");
-    bmps[7] = SDL_DisplayFormat(temp) ;
-
-    /* make random choice of bub */
-
-    bub_t_ptr->color = giveRandomNumber () ;
-
-    bub_t_ptr->sprite_ptr = bmps[bub_t_ptr->color] ;
-    //bub_t_ptr->sprite_ptr = SDL_DisplayFormat(temp) ;
-    
-    SDL_FreeSurface(temp) ;
-    
     bub_t_ptr->isLaunching = false ;
 
     bub_t_ptr->isMoving = false ;
@@ -62,15 +32,13 @@ void bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
+    return (1) ;
+
 }
 
 
 int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
-    //DBG printf ("back on launcher\n") ;
-
-    /* change bub color */
-    bub_changeColor (bub_t_ptr, game_t_ptr) ;
 
     /* return bubble to launcher */
     bub_t_ptr->position.x = bub_t_ptr->start_x;
@@ -79,15 +47,9 @@ int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     bub_t_ptr->x = bub_t_ptr->start_x;
     bub_t_ptr->y = bub_t_ptr->start_y;
 
-    return (0) ;
+    return (1) ;
 }
 
-int bub_changeColor (bub_t * bub_t_ptr, game_t * game_t_ptr) {
-
-    bub_t_ptr->color = giveRandomNumber() ;
-
-    return (0) ;
-}
 
 void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
 
@@ -145,7 +107,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
 bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
 {
 
-    bool debug = true ;
+    bool debug = false ;
 
     /* target_pos x and y */
 
@@ -227,9 +189,10 @@ bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
     float x_myBub = bub_t_ptr->x + BUB_SIZE / 2 ;
     float y_myBub = bub_t_ptr->y + BUB_SIZE / 2 ;
 
-    if (debug)
-        printf ("x_mybub = %f\n", x_myBub) ;
-        printf ("y_mybub = %f\n", y_myBub) ;
+    if (debug) {
+        printf("x_mybub = %f\n", x_myBub);
+        printf("y_mybub = %f\n", y_myBub);
+    }
 
     /* loop through empty spaces */
     short i, j, j_max ;
@@ -251,57 +214,23 @@ bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
                  if (debug)
                     printf ("Ligne : %d, Colonne : %d, Dist = %f\n", i, j,dist_between_centers);
 
-                if (dist_between_centers <= BUB_SIZE / 2.) {
-                    bubs_array[i][j] = 1 ;
+                if (dist_between_centers <= BUB_SIZE / 1.99) {
+                    /* 1.99 and not 2. because sometimes 2 is a little too much...
+                     * Ligne : 3, Colonne : 3, Dist = 20.006224
+                     * Ligne : 3, Colonne : 4, Dist = 20.017387 */
 
-                    if (debug)
-                        printf ("Bub placed at Line %d Col %d\n", i, j) ;
+                    bubs_array[i][j] = bub_t_ptr->color;
 
+                    if (debug) {
+                        printf("Bub color %d placed at Line %d Col %d\n", bub_t_ptr->color, i, j);
                     }
+                }
             }
         }
     }
 
     return true ;
 
-    /* row_num depends on Y
-     * for now we suppose it reaches the BOARD_TOP *//*
-    int row_num = 0 ;
-
-    *//* calculate the width taken by a bubble *//*
-    int bub_width = (BOARD_RIGHT - BOARD_LEFT) / BUB_NX ;
-
-    //printf ("bub_width = %d\n", bub_width) ;
-
-    *//* number of bubs on this row *//*
-    short num_bubs = (row_num % 2 == 0) ? 8 : 7 ;
-
-    //printf ("num_bubs = %d\n", num_bubs) ;
-
-    short j, place_pos = -1 ;
-
-    *//* the reference x is the middle of the bub *//*
-    double x = bub_t_ptr-> x + BUB_SIZE / 2 ;
-
-    //printf ("x = %f\n", x) ;
-
-    for (j = 0; j < num_bubs ; j += 1) {
-
-        short left = BOARD_LEFT + bub_width*(j) ;
-        short right = BOARD_LEFT + bub_width*(j+1) ;
-
-        *//* we check if our moving bubble just stopped between left and right x *//*
-        if ((x >= left) && (x < right)) {
-
-            place_pos = j ;
-            break ;
-        }
-    }
-
-    //printf("placing bub in %d\n", place_pos) ;
-
-    *//* let's update bubs_array *//*
-    bubs_array[row_num][place_pos] = 1 ;*/
 }
 
 bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers, double *target_pos_x, double *target_pos_y) {
@@ -347,6 +276,11 @@ bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_ce
 
     return false ;
 
+}
+
+bool bub_isBelowLimit (bub_t * bub_t_ptr) {
+
+    return bub_t_ptr->position.y > SCREEN_HEIGHT - LAUNCHER_HEIGHT ;
 }
 
 double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) {

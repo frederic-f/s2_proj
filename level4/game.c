@@ -12,6 +12,70 @@
 #include "bub.h"
 
 
+/* ------------------------------------------------------------------------- */
+int game_init (game_t * game_t_ptr) {
+
+    bool debug = true ;
+
+    if (debug) {
+        printf ("game initialized\n") ;
+    }
+
+    /* Load the Sprites */
+    if (!game_loadSprites (game_t_ptr))
+        fatal ("Could not load Sprites") ;
+
+    /* Initializes bubs_array */
+
+
+
+    /* Put all spots to 0 */
+    // game_resetBubsArray (game_t_ptr) ;
+
+
+    return (1) ;
+}
+
+
+/* ------------------------------------------------------------------------- */
+int game_loadSprites (game_t * game_t_ptr) {
+
+    SDL_Surface *temp ;
+
+    /* Loading the BUBS */
+    temp = SDL_LoadBMP("img/bub_black.bmp");
+    game_t_ptr->bubs[0] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_blue.bmp");
+    game_t_ptr->bubs[1] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_green.bmp");
+    game_t_ptr->bubs[2] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_orange.bmp");
+    game_t_ptr->bubs[3] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_purple.bmp");
+    game_t_ptr->bubs[4] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_red.bmp");
+    game_t_ptr->bubs[5] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_white.bmp");
+    game_t_ptr->bubs[6] = SDL_DisplayFormat(temp) ;
+
+    temp = SDL_LoadBMP("img/bub_yellow.bmp");
+    game_t_ptr->bubs[7] = SDL_DisplayFormat(temp) ;
+
+
+    SDL_FreeSurface(temp) ;
+
+    return (1) ;
+}
+
+
+
+/* ------------------------------------------------------------------------- */
 /* function that receives [i=lig][j=col] of a cell from the bubs_array
  * returns a _ptr to SDL_Rect object with coords /x and y OF TOP LEFT CORNER/
  * so that main program can position the bub
@@ -31,6 +95,8 @@ SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
     return dumRect_ptr ;
 }
 
+
+/* ------------------------------------------------------------------------- */
 short giveRandomNumber() {
 
     time_t t ;
@@ -38,12 +104,13 @@ short giveRandomNumber() {
     /* Initializes random number generator */
     srand ((unsigned) time (&t)) ;
 
-    /* Generates numbers from 0 to 8 */
-    return rand() % 9 ;
+    /* Generates numbers from 0 to NUM_COLOR */
+    return rand() % NUM_COLOR ;
 }
 
-void HandleEvent(SDL_Event event,
-                 int * quit, int * currOrientation, bub_t * bub_t_ptr)
+
+/* ------------------------------------------------------------------------- */
+void HandleEvent (SDL_Event event, int * quit, int * currOrientation, bub_t * bub_t_ptr)
 {
     switch (event.type) {
         /* close button  clicked */

@@ -10,15 +10,13 @@
 
 int main(int argc, char* argv[])
 {
-    bool debug = true ;
 
-    struct Game_t * game_t_ptr = (struct Game_t *) malloc (sizeof(struct Game_t)) ;
-
-    SDL_Surface *screen_srf_ptr, *temp, *launcher_srf_ptr, *frame_srf_ptr;
 
     /* ****************************************************************************************************************
     * SDL initialization
     * ************************************************************************************************************** */
+
+    SDL_Surface *screen_srf_ptr, *temp, *launcher_srf_ptr, *frame_srf_ptr;
 
     /* initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
@@ -31,6 +29,17 @@ int main(int argc, char* argv[])
 
     /* set keyboard repeat */
     SDL_EnableKeyRepeat(10, 30);
+
+
+    /* ****************************************************************************************************************
+    * GAME initialization
+    * ************************************************************************************************************** */
+
+    bool debug = false ;
+
+    struct Game_t * game_t_ptr = (struct Game_t *) malloc (sizeof(struct Game_t)) ;
+
+    game_init (game_t_ptr) ;
 
 
     /* ****************************************************************************************************************
@@ -53,7 +62,7 @@ int main(int argc, char* argv[])
     /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
     int * * * bub_array_centers = (int * * *) malloc (BUB_NY * sizeof(int * *)) ;
 
-    /* TODO make those two arrays a single one ? */
+    /* TODO put arrays in game_t */
 
     SDL_Rect * rectForCenters_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
 
@@ -84,7 +93,6 @@ int main(int argc, char* argv[])
             /* we use the function to get coords of TOP LEFT corner */
             rectForCenters_ptr = getBubPositionRect(i, j, rectForCenters_ptr) ;
 
-
             /* and add BUB_SIZE/2 to get coords of centers */
             bub_array_centers[i][j][0] = rectForCenters_ptr->x + BUB_SIZE/2 ;
             bub_array_centers[i][j][1] = rectForCenters_ptr->y + BUB_SIZE/2 ;
@@ -92,8 +100,22 @@ int main(int argc, char* argv[])
     }
 
     if (debug) {
-        printf("Check x = %d\n", bub_array_centers[1][0][0]);
-        printf("Check y = %d\n", bub_array_centers[1][0][1]);
+        //printf("Check x = %d\n", bub_array_centers[1][0][0]);
+        //printf("Check y = %d\n", bub_array_centers[1][0][1]);
+
+        printf ("Values of bubs_array \n") ;
+
+        for (i = 0 ; i < BUB_NY ; i += 1) {
+
+            /* number of bubs in a row depends on odd/even number of row */
+            int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+            for (j = 0 ; j < j_max ; j +=1 ) {
+
+                printf ("Value %d\n", bubs_array[i][j]) ;
+
+            }
+        }
     }
 
 
@@ -143,7 +165,11 @@ int main(int argc, char* argv[])
     SDL_SetColorKey(launcher_srf_ptr, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
 
     /* BUB transparency*/
-    SDL_SetColorKey(bub_t_ptr->sprite_ptr, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+    int k ;
+    for (k = 0 ; k < NUM_COLOR ; k += 1) {
+        SDL_SetColorKey(game_t_ptr->bubs[k], SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+    }
+
 
     /* Rectangle to store the position of the sprite in the window. */
     SDL_Rect launcherPos_rect;
@@ -179,15 +205,21 @@ int main(int argc, char* argv[])
         if (bub_t_ptr->isMoving) {
 
             /* try to move bub
-             * false => collision or hit TOP => place the bub properly on grid */
+             * if !move : 2 reasons possible
+             * 1. collision -> we check game over, otherwise we place bub
+             * 2. hit top -> we place bub */
             if (!bub_move (bub_t_ptr, bubs_array, bub_array_centers)) {
 
-                /* place the new bub into non-moving bubs_array */
-                bub_place (bub_t_ptr, bubs_array, bub_array_centers);
+                if (bub_isBelowLimit (bub_t_ptr)) {
+                    gameover = 1 ;
+                }
+                else {
+                    /* place the new bub into non-moving bubs_array */
+                    bub_place (bub_t_ptr, bubs_array, bub_array_centers);
 
-                /* return bub to luncher */
-                bub_getOnLauncher (bub_t_ptr, game_t_ptr);
-
+                    /* return bub to launcher */
+                    bub_init (bub_t_ptr, game_t_ptr);
+                }
             }
         }
 
@@ -246,17 +278,21 @@ int main(int argc, char* argv[])
         /* parsing the array of non-moving bubs : i=rows, j=cols */
         for (i = 0 ; i < BUB_NY ; i += 1) {
 
-            for (j = 0 ; j < BUB_NX ; j +=1 ) {
+            /* number of bubs in a row depends on odd/even number of row */
+            int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+            for (j = 0 ; j < j_max ; j +=1 ) {
 
                 /* process only the bubs set to 1 */
-                if (bubs_array[i][j] == 1) {
+                if (bubs_array[i][j] > 0) {
 
                     /* update the position of the bub to display */
                     dumRect_ptr = getBubPositionRect(i, j, dumRect_ptr);
 
                     /* display */
-                    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, screen_srf_ptr, dumRect_ptr);
+                    SDL_BlitSurface(game_t_ptr->bubs[bubs_array[i][j] -1], &bub_rect, screen_srf_ptr, dumRect_ptr);
                 }
+
             }
         }
 
