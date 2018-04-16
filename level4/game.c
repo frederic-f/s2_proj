@@ -21,17 +21,23 @@ int game_init (game_t * game_t_ptr) {
         printf ("game initialized\n") ;
     }
 
-    /* Load the Sprites */
+    /* Load all Sprites */
     if (!game_loadSprites (game_t_ptr))
         fatal ("Could not load Sprites") ;
 
     /* Initializes bubs_array */
+    /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
+    game_t_ptr->bubs_array = (int * *) malloc (BUB_NY * sizeof(int *)) ;
 
+    /* Reset bubs_array = removes all bubs from screen */
+    game_resetBubsArray (game_t_ptr) ;
 
+    /* Initializes bub_array_centers */
+    /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
+    game_t_ptr->bub_array_centers = (int * * *) malloc (BUB_NY * sizeof(int * *)) ;
 
-    /* Put all spots to 0 */
-    // game_resetBubsArray (game_t_ptr) ;
-
+    /* Load bub_array_centers */
+    game_setBubsArrayCenters (game_t_ptr) ;
 
     return (1) ;
 }
@@ -72,6 +78,89 @@ int game_loadSprites (game_t * game_t_ptr) {
 
     return (1) ;
 }
+
+
+/* ------------------------------------------------------------------------- */
+int game_resetBubsArray (game_t * game_t_ptr) {
+
+    bool debug = false ;
+
+    int i, j ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        game_t_ptr->bubs_array[i] = (int *) malloc (BUB_NX * sizeof(int)) ;
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            /* set whole lines of bubs here if you want to test */
+            //bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? 1 : 0 ;
+
+            /* set all bubs to value */
+            game_t_ptr->bubs_array[i][j] = 0 ;
+        }
+    }
+
+
+    if (debug) {
+        //printf("Check x = %d\n", bub_array_centers[1][0][0]);
+        //printf("Check y = %d\n", bub_array_centers[1][0][1]);
+
+        printf ("Values of bubs_array \n") ;
+
+        for (i = 0 ; i < BUB_NY ; i += 1) {
+
+            /* number of bubs in a row depends on odd/even number of row */
+            int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+            for (j = 0 ; j < j_max ; j +=1 ) {
+
+                printf ("Value %d\n", game_t_ptr->bubs_array[i][j]) ;
+
+            }
+        }
+    }
+
+    return (1) ;
+}
+
+
+/* ------------------------------------------------------------------------- */
+int game_setBubsArrayCenters (game_t * game_t_ptr) {
+
+    SDL_Rect * rectForCenters_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
+
+    int i, j ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        game_t_ptr->bub_array_centers[i] = (int * *) malloc (BUB_NX * sizeof(int *)) ;
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            /* array centers */
+            game_t_ptr->bub_array_centers[i][j] = (int *) malloc (2 * sizeof(int)) ;
+
+            /* we use the function to get coords of TOP LEFT corner */
+            rectForCenters_ptr = getBubPositionRect(i, j, rectForCenters_ptr) ;
+
+            /* and add BUB_SIZE/2 to get coords of centers */
+            game_t_ptr->bub_array_centers[i][j][0] = rectForCenters_ptr->x + BUB_SIZE/2 ;
+            game_t_ptr->bub_array_centers[i][j][1] = rectForCenters_ptr->y + BUB_SIZE/2 ;
+        }
+    }
+
+    free (rectForCenters_ptr) ;
+
+    return (1) ;
+}
+
 
 
 

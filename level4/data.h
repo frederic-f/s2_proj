@@ -38,7 +38,9 @@ struct Game_t {
 
     SDL_Surface * bubs[NUM_COLOR] ;
 
-    short gameover ;
+    int * * bubs_array ; /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
+
+    int * * * bub_array_centers ; /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
 
 };
 typedef struct Game_t game_t ;

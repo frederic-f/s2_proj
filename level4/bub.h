@@ -20,11 +20,11 @@ int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 int bub_changeColor () ;
 
-bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
+bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
-bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) ;
+bool bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
-bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers, double *target_pos_x, double *target_pos_y) ;
+bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos_x, double *target_pos_y) ;
 
 bool bub_isBelowLimit (bub_t * bub_t_ptr) ;
 

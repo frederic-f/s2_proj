@@ -14,19 +14,26 @@
 
 int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
-    bool debug = true ;
+    bool debug = false ;
 
     if (debug)
         printf ("bub_t initialised\n") ;
 
+    /* giveRandomNumber returns 0-7
+     * that number will be stored in bubs_array
+     * in bubs_array : 0 is for no bub
+     * so we add 1 here */
     bub_t_ptr->color = giveRandomNumber () + 1 ;
 
+    /* load new sprite with random color */
     bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
+
 
     bub_t_ptr->isLaunching = false ;
 
     bub_t_ptr->isMoving = false ;
 
+    /* reset starting coordinates for bub */
     bub_t_ptr->start_x = 720 / 2 - BUB_SIZE / 2 - 1;
     bub_t_ptr->start_y = BUB_START_Y;
 
@@ -104,7 +111,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
 
 }
 
-bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
+bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 {
 
     bool debug = false ;
@@ -125,7 +132,7 @@ bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
     /* now we check the different scenarios : collision, hit top, hit borders, ...*/
 
     /* 1. COLLISION */
-    if (bub_isColliding (bub_t_ptr, bubs_array, bub_array_centers, target_pos_x, target_pos_y)) {
+    if (bub_isColliding (bub_t_ptr, game_t_ptr, target_pos_x, target_pos_y)) {
 
         //printf ("paf\n") ;
 
@@ -177,7 +184,7 @@ bool bub_move (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
 
 }
 
-bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers) {
+bool bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     bool debug = false ;
 
@@ -204,10 +211,10 @@ bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
         for (j = 0 ; j < j_max ; j += 1) {
 
             /* if there is NO bub at this position */
-            if (bubs_array[i][j] == 0) {
+            if (game_t_ptr->bubs_array[i][j] == 0) {
 
-                float x_otherBub = bub_array_centers[i][j][0] ;
-                float y_otherBub = bub_array_centers[i][j][1] ;
+                float x_otherBub = game_t_ptr->bub_array_centers[i][j][0] ;
+                float y_otherBub = game_t_ptr->bub_array_centers[i][j][1] ;
 
                 float dist_between_centers = bub_getDistanceBetweenTwoBubs(x_myBub, y_myBub, x_otherBub, y_otherBub) ;
 
@@ -219,7 +226,7 @@ bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
                      * Ligne : 3, Colonne : 3, Dist = 20.006224
                      * Ligne : 3, Colonne : 4, Dist = 20.017387 */
 
-                    bubs_array[i][j] = bub_t_ptr->color;
+                    game_t_ptr->bubs_array[i][j] = bub_t_ptr->color;
 
                     if (debug) {
                         printf("Bub color %d placed at Line %d Col %d\n", bub_t_ptr->color, i, j);
@@ -233,7 +240,7 @@ bool bub_place (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers)
 
 }
 
-bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_centers, double *target_pos_x, double *target_pos_y) {
+bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos_x, double *target_pos_y) {
 
     bool debug = false ;
 
@@ -250,10 +257,10 @@ bool bub_isColliding (bub_t * bub_t_ptr, int ** bubs_array, int *** bub_array_ce
         for (j = 0 ; j < j_max ; j += 1) {
 
             /* if there is a bub at this position */
-            if (bubs_array[i][j] > 0) {
+            if (game_t_ptr->bubs_array[i][j] > 0) {
 
-                double x_otherBub = bub_array_centers[i][j][0] ;
-                double y_otherBub = bub_array_centers[i][j][1] ;
+                double x_otherBub = game_t_ptr->bub_array_centers[i][j][0] ;
+                double y_otherBub = game_t_ptr->bub_array_centers[i][j][1] ;
 
                 /* see if there is a collision */
                 double dist_between_centers = bub_getDistanceBetweenTwoBubs(x_myBub, y_myBub, x_otherBub, y_otherBub) ;
