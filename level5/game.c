@@ -27,19 +27,43 @@ int game_init (game_t * game_t_ptr) {
     if (!game_loadSprites (game_t_ptr))
         fatal ("Could not load Sprites") ;
 
+
+    /* bubs_array*/
+
     /* Initializes bubs_array */
     /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
-    game_t_ptr->bubs_array = (int * *) malloc (BUB_NY * sizeof(int *)) ;
+    game_t_ptr->bubs_array = (int * *) malloc (BUB_NY * sizeof (int *)) ;
 
     /* Reset bubs_array = removes all bubs from screen */
     game_resetBubsArray (game_t_ptr) ;
 
+
+    /* bub_array_center*/
+
     /* Initializes bub_array_centers */
     /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
-    game_t_ptr->bub_array_centers = (int * * *) malloc (BUB_NY * sizeof(int * *)) ;
+    game_t_ptr->bub_array_centers = (int * * *) malloc (BUB_NY * sizeof (int * *)) ;
 
     /* Load bub_array_centers */
     game_setBubsArrayCenters (game_t_ptr) ;
+
+
+    /* bub_connected_component */
+
+    /* Connected components*/
+    game_t_ptr->bub_connected_component = (int * *) malloc (BUB_NY * sizeof (int *)) ;
+
+    /* set bub_connected_component */
+    game_setBubConnectedComponent (game_t_ptr) ;
+
+
+    /* bub_fifo */
+
+    /* Queue for connexity*/
+    game_t_ptr->bub_fifo = (int * *) malloc ((BUB_NY * BUB_NX) * sizeof (int *)) ;
+
+    /* set bub_connected_component */
+    game_setBubFifo (game_t_ptr) ;
 
     return (1) ;
 }
@@ -86,7 +110,7 @@ int game_loadSprites (game_t * game_t_ptr) {
 
 /* ****************************************************************************************************************
 *
-* ************************************************************************************************************** */
+* **************************************************1.0************************************************************ */
 int game_resetBubsArray (game_t * game_t_ptr) {
 
     bool debug = false ;
@@ -102,18 +126,19 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
         for (j = 0 ; j < j_max ; j +=1 ) {
 
+            int col = j + getRandomNumber(NUM_COLOR) ;
+            col = (col > 8) ? 8 : col ;
+
             /* set whole lines of bubs here if you want to test */
-            //bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? get : 0 ;
+            game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
 
             /* set all bubs to value */
-            game_t_ptr->bubs_array[i][j] = 0 ;
+            //game_t_ptr->bubs_array[i][j] = 0 ;
         }
     }
 
 
     if (debug) {
-        //printf("Check x = %d\n", bub_array_centers[1][0][0]);
-        //printf("Check y = %d\n", bub_array_centers[1][0][1]);
 
         printf ("Values of bubs_array \n") ;
 
@@ -171,6 +196,151 @@ int game_setBubsArrayCenters (game_t * game_t_ptr) {
 
 
 /* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int game_setBubConnectedComponent (game_t * game_t_ptr) {
+
+    bool debug = false ;
+
+    int i, j ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        game_t_ptr->bub_connected_component[i] = (int *) malloc (BUB_NX * sizeof(int)) ;
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            int col = j + getRandomNumber(NUM_COLOR) ;
+            col = (col > 8) ? 8 : col ;
+
+            /* set whole lines of bubs here if you want to test */
+            game_t_ptr->bub_connected_component[i][j] = 0 ;
+        }
+    }
+
+
+    if (debug) {
+
+        printf ("Values of bub_connected_components \n") ;
+
+        for (i = 0 ; i < BUB_NY ; i += 1) {
+
+            /* number of bubs in a row depends on odd/even number of row */
+            int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+            for (j = 0 ; j < j_max ; j +=1 ) {
+
+                printf ("Connected components [ %d ] [ %d ] : %d\n",i, j,  game_t_ptr->bub_connected_component[i][j]) ;
+
+            }
+        }
+    }
+
+    return (1) ;
+}
+
+
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int game_setBubFifo (game_t * game_t_ptr) {
+
+    int i ;
+
+    for (i = 0 ; i < (BUB_NY * BUB_NX) ; i += 1) {
+
+        game_t_ptr->bub_connected_component[i] = (int *) malloc (2 * sizeof (short)) ;
+    }
+
+    game_t_ptr->fifoHead = 0 ;
+    game_t_ptr->fifoTail = 0 ;
+
+    return (1) ;
+}
+
+
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
+
+    bool debug = true ;
+
+    if (debug)
+        printf ("Coordinates just received : line = %d, col = %d\n", bubJustPlaced_rect->y, bubJustPlaced_rect->x) ;
+
+    /* if bub just placed can be added ... */
+    if (game_addBubConnected (game_t_ptr, bubJustPlaced_rect)) {
+
+        /* ... then we check the new network of connexity *//*
+
+        *//* this temp will hold the current bub whose connexity is checked *//*
+        SDL_Rect * bubTmp_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+        *//* loop to explore connexity *//*
+        while (game_t_ptr->fifoHead != game_t_ptr->fifoTail) {
+
+            *//* get coordinates of next bub in queue *//*
+            bubTmp_rect->y = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][0] ;
+            bubTmp_rect->x = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][1] ;
+
+            *//* get all the neighbours *//*
+
+            if ((bubTmp_rect->y % 2) == 0) { // bub is on even row
+
+                *//* for each neighbour :
+                 * 1. check existence of spot
+                 * 2. check presence of bub
+                 * 3. check color of bub *//*
+
+                *//* first neighbour *//*
+                if ((bubTmp_rect->x - 1) >= 0) {
+                    continue ;
+                }
+
+            }
+
+            game_t_ptr->fifoTail += 1 ;
+        }*/
+
+    }
+
+    return (1) ;
+
+}
+
+
+
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
+
+    bool debug = true ;
+
+    /* add to bub_connected_component */
+    game_t_ptr->bub_connected_component[bubJustPlaced_rect->y][bubJustPlaced_rect->x] = 1 ;
+
+    /* add to queue for connexity processing */
+    game_t_ptr->bub_fifo[game_t_ptr->fifoHead][0] = bubJustPlaced_rect->y ;
+    game_t_ptr->bub_fifo[game_t_ptr->fifoHead][1] = bubJustPlaced_rect->x ;
+
+    game_t_ptr->fifoHead += 1 ;
+
+
+    if (debug) {
+        printf ("Head is now : %d \n", game_t_ptr->fifoHead) ;
+    }
+
+    return (1) ;
+
+}
+
+
+/* ****************************************************************************************************************
 * SYSTEM functions
 * ************************************************************************************************************** */
 
@@ -202,7 +372,8 @@ SDL_Rect * getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-short giveRandomNumber() {
+short getRandomNumber(int max) {
+
 
     time_t t ;
 
@@ -210,7 +381,7 @@ short giveRandomNumber() {
     srand ((unsigned) time (&t)) ;
 
     /* Generates numbers from 0 to NUM_COLOR */
-    return rand() % NUM_COLOR ;
+    return rand() % max ;
 }
 
 
