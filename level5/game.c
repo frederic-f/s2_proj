@@ -269,45 +269,92 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
     bool debug = true ;
 
-    if (debug)
-        printf ("Coordinates just received : line = %d, col = %d\n", bubJustPlaced_rect->y, bubJustPlaced_rect->x) ;
-
+    if (debug) { 
+        printf ("****************************************************\n") ; 
+	printf ("*Connexity check ***********************************\n\n") ; 
+	printf ("Coordinates just received : line = %d, col = %d\n", bubJustPlaced_rect->y, bubJustPlaced_rect->x) ;
+	printf ("Starting connexity check\n") ;  
+    }
+	
     /* if bub just placed can be added ... */
     if (game_addBubConnected (game_t_ptr, bubJustPlaced_rect)) {
 
-        /* ... then we check the new network of connexity *//*
+        /* ... then we check the new network of connexity */
 
-        *//* this temp will hold the current bub whose connexity is checked *//*
-        SDL_Rect * bubTmp_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+        /* this temp will hold the current coordinates of spot whose connexity is checked */
+        SDL_Rect * bubCoord_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
-        *//* loop to explore connexity *//*
+	/* this temp will hold the neighboring bubs */
+	bub_t * bub_t_neighbour_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
+	
+        /* loop to explore connexity */
         while (game_t_ptr->fifoHead != game_t_ptr->fifoTail) {
 
-            *//* get coordinates of next bub in queue *//*
-            bubTmp_rect->y = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][0] ;
-            bubTmp_rect->x = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][1] ;
+            /* get coordinates of next bub in queue */
+            bubCoord_rect->y = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][0] ;
+            bubCoord_rect->x = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][1] ;
 
-            *//* get all the neighbours *//*
+            /* get all the neighbours */
 
-            if ((bubTmp_rect->y % 2) == 0) { // bub is on even row
-
-                *//* for each neighbour :
+            if ((bubCoord_rect->y % 2) == 0) { // bub is on even row
+		if (debug)
+			printf ("Current bub on even row\n") ;
+		
+		
+		 /* for each neighbour :
                  * 1. check existence of spot
                  * 2. check presence of bub
-                 * 3. check color of bub *//*
+                 * 3. check color of bub */
 
-                *//* first neighbour *//*
-                if ((bubTmp_rect->x - 1) >= 0) {
-                    continue ;
+                /* first neighbour */
+                /* check existence of spot : is it within frame boundaries ?*/
+		if (((bubCoord_rect->x - 1) >= 0) && ((bubCoord_rect->y -1) >= 0)) {
+                    printf ("1st neigh. spot exists\n") ;
                 }
+                
+                
 
             }
+            else {
+		 if (debug) {
+			printf ("Current bub on odd row\n") ;
+		 
+		 }
+		 
+		/* 1st neighbour, 9 o'clock*/
+                bubCoord_rect->x -= 1 ;
+		
+		if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+			printf ("1st neigh. exists. Color = \n") ;    
+		}
+		else {
+			printf ("1st neigh. DONT exists\n") ;
+		}
+		
+		/* 2nd neighbour, 11 o'clock*/
+                bubCoord_rect->x += 1 ;
+		bubCoord_rect->y -= 1 ;
+		
+		if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+			printf ("2nd neigh. exists. Color = \n") ;    
+		}
+                
+	    }
 
             game_t_ptr->fifoTail += 1 ;
-        }*/
+        }
 
+        free (bub_t_neighbour_ptr) ;
+        
     }
+    
+    if (debug) {
+        printf ("Connexity checked\n") ;
+	printf ("****************************************************\n") ;	
+    }
+    
 
+    
     return (1) ;
 
 }
@@ -332,11 +379,27 @@ int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
 
     if (debug) {
-        printf ("Head is now : %d \n", game_t_ptr->fifoHead) ;
+	printf ("Bub added to queue. Head is now : %d \n", game_t_ptr->fifoHead) ;
     }
 
     return (1) ;
 
+}
+
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rect * rect_ptr) {
+	
+    /* first check if it is within boundaries */
+    
+    /* then check if there is a bub */
+    
+    /* if so return the bub */
+    
+    /* if not return false */
+
+    return NULL ;
 }
 
 
