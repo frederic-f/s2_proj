@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
                     }
 
                     /* get rid of bubs according to connexity rules */
-                    if (!game_checkConnexity (game_t_ptr, bubJustPlaced_rect))
+                    if (!game_checkConnexityColor (game_t_ptr, bubJustPlaced_rect))
                         fatal ("Problem cheking connexity") ;
 
                     /* return bub to launcher */

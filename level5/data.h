@@ -44,6 +44,8 @@ struct Game_t {
 
     int fifoHead, fifoTail ; /* indexes for bub_fifo */
 
+    int bub_ny ; /* used we roof goes down */
+
 };
 typedef struct Game_t game_t ;
 

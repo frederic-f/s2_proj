@@ -24,7 +24,7 @@ int game_setBubConnectedComponent (game_t * game_t_ptr) ;
 
 int game_setBubFifo (game_t * game_t_ptr) ;
 
-int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
+int game_checkConnexityColor (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
 
 int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) ;
 

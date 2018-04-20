@@ -19,13 +19,15 @@ int game_init (game_t * game_t_ptr) {
 
     bool debug = true ;
 
+    game_t_ptr->bub_ny = BUB_NY ;
+
     if (debug) {
-        printf ("game initialized\n") ;
+        printf ("**game initialized\n\n") ;
     }
 
     /* Load all Sprites */
     if (!game_loadSprites (game_t_ptr))
-        fatal ("Could not load Sprites") ;
+        fatal ("!!Could not load Sprites") ;
 
 
     /* bubs_array*/
@@ -265,29 +267,39 @@ int game_setBubFifo (game_t * game_t_ptr) {
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
+int game_checkConnexityColor (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
     bool debug = true ;
 
     if (debug) { 
-        printf ("****************************************************\n") ; 
-	printf ("*Connexity check ***********************************\n\n") ; 
-	printf ("Coordinates just received : line = %d, col = %d\n", bubJustPlaced_rect->y, bubJustPlaced_rect->x) ;
-	printf ("Starting connexity check\n") ;  
-    }
+
+	    printf ("**Connexity check \n\n") ;
+	    printf ("  Coordinates just received : line = %d, col = %d\n", bubJustPlaced_rect->y, bubJustPlaced_rect->x) ;
+	    printf ("  Starting connexity check\n") ;
+        }
 	
-    /* if bub just placed can be added ... */
+    /* if bub we just placed can be added ... */
     if (game_addBubConnected (game_t_ptr, bubJustPlaced_rect)) {
 
         /* ... then we check the new network of connexity */
 
+        /* memory allocation for temp variables */
+
         /* this temp will hold the current coordinates of spot whose connexity is checked */
         SDL_Rect * bubCoord_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
-	/* this temp will hold the neighboring bubs */
-	bub_t * bub_t_neighbour_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
-	
+	    /* this temp will hold the neighboring bubs */
+	    bub_t * bub_t_neighbour_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
+	    /* we keep the address in memory to re-assign it after NULL is assigned to it by function game_getBubAt */
+        bub_t * bub_t_neighbour_ptr_2 = bub_t_neighbour_ptr ;
+
+        /* get the color for connexity */
+        bub_t_neighbour_ptr = game_getBubAt(game_t_ptr, bub_t_neighbour_ptr, bubJustPlaced_rect) ;
+        short colorForConnexity = bub_t_neighbour_ptr->color ;
+
         /* loop to explore connexity */
+
+        /* while the queue is not empty...*/
         while (game_t_ptr->fifoHead != game_t_ptr->fifoTail) {
 
             /* get coordinates of next bub in queue */
@@ -297,49 +309,121 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             /* get all the neighbours */
 
             if ((bubCoord_rect->y % 2) == 0) { // bub is on even row
-		if (debug)
-			printf ("Current bub on even row\n") ;
-		
-		
-		 /* for each neighbour :
-                 * 1. check existence of spot
-                 * 2. check presence of bub
-                 * 3. check color of bub */
-
-                /* first neighbour */
-                /* check existence of spot : is it within frame boundaries ?*/
-		if (((bubCoord_rect->x - 1) >= 0) && ((bubCoord_rect->y -1) >= 0)) {
-                    printf ("1st neigh. spot exists\n") ;
-                }
-                
-                
-
+                if (debug)
+                    printf("  Current bub on even row\n");
             }
+
             else {
-		 if (debug) {
-			printf ("Current bub on odd row\n") ;
-		 
-		 }
-		 
-		/* 1st neighbour, 9 o'clock*/
-                bubCoord_rect->x -= 1 ;
-		
-		if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
-			printf ("1st neigh. exists. Color = \n") ;    
-		}
-		else {
-			printf ("1st neigh. DONT exists\n") ;
-		}
-		
-		/* 2nd neighbour, 11 o'clock*/
+
+                if (debug) {
+                    printf ("  Current bub on odd row\n") ;
+                }
+
+                /* 1st neighbour, 1 o'clock*/
                 bubCoord_rect->x += 1 ;
-		bubCoord_rect->y -= 1 ;
-		
-		if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
-			printf ("2nd neigh. exists. Color = \n") ;    
-		}
-                
-	    }
+                bubCoord_rect->y -= 1 ;
+
+                printf ("  1st neigh coord %d %d\n", bubCoord_rect->x, bubCoord_rect->y) ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  1st neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* if the color is the same... */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+
+                        /* ... we add it to the queue*/
+
+
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  1st neigh DONT exists\n") ;
+                }
+
+                /* 2nd neighbour, 3 o'clock*/
+                bubCoord_rect->y += 1 ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  2nd neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* we check the color */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  2nd neigh DONT exists\n") ;
+                }
+
+                /* 3rd neighbour, 5 o'clock*/
+                bubCoord_rect->y += 1 ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  3rd neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* we check the color */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  3rd neigh DONT exists\n") ;
+                }
+
+                /* 4th neighbour, 7 o'clock*/
+                bubCoord_rect->x -= 1 ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  4th neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* we check the color */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  4th neigh DONT exists\n") ;
+                }
+
+                /* 5th neighbour, 9 o'clock*/
+                bubCoord_rect->x -= 1 ;
+                bubCoord_rect->y -= 1 ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  5th neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* we check the color */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  5th neigh DONT exists\n") ;
+                }
+
+                /* 6th neighbour, 11 o'clock*/
+                bubCoord_rect->x += 1 ;
+                bubCoord_rect->y -= 1 ;
+
+                if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
+                    printf ("  6th neigh exists. Color = %d\n", bub_t_neighbour_ptr->color) ;
+
+                    /* we check the color */
+                    if (bub_t_neighbour_ptr->color == colorForConnexity) {
+                        printf ("    same color!") ;
+                    }
+                }
+                else {
+                    bub_t_neighbour_ptr = bub_t_neighbour_ptr_2 ;
+                    printf ("  6th neigh DONT exists\n") ;
+                }
+	        }
 
             game_t_ptr->fifoTail += 1 ;
         }
@@ -349,12 +433,10 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
     }
     
     if (debug) {
-        printf ("Connexity checked\n") ;
-	printf ("****************************************************\n") ;	
+        printf ("**Connexity checked\n") ;
     }
     
 
-    
     return (1) ;
 
 }
@@ -379,7 +461,7 @@ int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
 
     if (debug) {
-	printf ("Bub added to queue. Head is now : %d \n", game_t_ptr->fifoHead) ;
+	printf ("**Bub added to queue. Head is now : %d \n", game_t_ptr->fifoHead) ;
     }
 
     return (1) ;
@@ -390,16 +472,52 @@ int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 *
 * ************************************************************************************************************** */
 bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rect * rect_ptr) {
-	
-    /* first check if it is within boundaries */
-    
-    /* then check if there is a bub */
-    
-    /* if so return the bub */
-    
-    /* if not return false */
 
-    return NULL ;
+    bool debug = false ;
+
+    if (debug) {
+        printf ("**entering getBubAt\n") ;
+        printf (" returning bub at line = %d, col = %d\n", rect_ptr->y, rect_ptr->x) ;
+    }
+
+    /* first check if it is within boundaries */
+
+    /* Y coordinate : if y < 0 or y > bub_ny : NULL */
+    if ((rect_ptr->y < 0) || (rect_ptr->y > game_t_ptr->bub_ny)) {
+        return NULL ;
+    }
+
+    /* X coordinate
+     * if even row : min_x = 0 max_x = 7 */
+    if ((rect_ptr->y % 2) == 0) {
+
+        if ((rect_ptr->x < 0) || (rect_ptr->x > 7)) {
+            return NULL ;
+        }
+    }
+    /* if odd row : min_x = 0, max x = 6 */
+    else {
+
+        if ((rect_ptr->x < 0) || (rect_ptr->x > 6)) {
+            return NULL;
+        }
+    }
+
+    /* then check if there is a bub : use bubs_array */
+    if (game_t_ptr->bubs_array[rect_ptr->y][rect_ptr->x] > 0) {
+
+        /* if so return bub_t_ptr
+         * with updated  Position_x, Position_y and color */
+
+        bub_t_neighbour_ptr->color = game_t_ptr->bubs_array[rect_ptr->y][rect_ptr->x] ;
+
+        return bub_t_neighbour_ptr ;
+    }
+    else {
+
+        /* no bub */
+        return NULL ;
+    }
 }
 
 
