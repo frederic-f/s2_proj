@@ -20,11 +20,15 @@ int game_resetBubsArray (game_t * game_t_ptr) ;
 
 int game_setBubsArrayCenters (game_t * game_t_ptr) ;
 
-int game_setBubConnectedComponent (game_t * game_t_ptr) ;
+int game_resetBubConnectedComponent (game_t * game_t_ptr) ;
 
-int game_setBubFifo (game_t * game_t_ptr) ;
+int game_resetConnexity (game_t * game_t_ptr) ;
 
-int game_checkConnexityColor (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
+int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
+
+int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect, bool colorConnexity) ;
+
+int game_spotCheckConnexity (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, bub_t * bub_t_neighbour_ptr_2, SDL_Rect * bubCoord_rect, bool colorConnexity, short colorForConnexity) ;
 
 int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) ;
 

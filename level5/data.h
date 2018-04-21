@@ -16,7 +16,7 @@
 #define LAUNCHER_DIV        48 // PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations
 #define PI 3.14159265359
 
-#define VELOCITY            1  // bubble velocity
+#define VELOCITY            1.2  // bubble velocity
 #define BUB_SIZE            40 // horizontal and vertical size
 #define BUB_START_Y         457
 
@@ -44,7 +44,7 @@ struct Game_t {
 
     int fifoHead, fifoTail ; /* indexes for bub_fifo */
 
-    int bub_ny ; /* used we roof goes down */
+    int bub_ny ; /* used when roof goes down */
 
 };
 typedef struct Game_t game_t ;
