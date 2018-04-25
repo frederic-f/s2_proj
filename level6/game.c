@@ -8,14 +8,17 @@
 #include <time.h>
 
 #include "data.h"
+#include "sys.h"
 #include "game.h"
 #include "bub.h"
+
+
 
 
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-int game_init (game_t * game_t_ptr) {
+int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
     bool debug = true ;
 
@@ -28,7 +31,7 @@ int game_init (game_t * game_t_ptr) {
     }
 
     /* Load all Sprites */
-    if (!game_loadSprites (game_t_ptr))
+    if (!game_loadSprites (game_t_ptr, sys_t_ptr))
         fatal ("!!Could not load Sprites") ;
 
 
@@ -85,7 +88,7 @@ int game_init (game_t * game_t_ptr) {
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-int game_loadSprites (game_t * game_t_ptr) {
+int game_loadSprites (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
     SDL_Surface *temp ;
 
@@ -117,6 +120,14 @@ int game_loadSprites (game_t * game_t_ptr) {
 
     SDL_FreeSurface(temp) ;
 
+
+    /* make sprites transparent */
+    int k ;
+    for (k = 0 ; k < NUM_COLOR ; k += 1) {
+        sys_makeTransparent (sys_t_ptr, game_t_ptr->bubs[k]);
+    }
+
+
     return (1) ;
 }
 
@@ -145,7 +156,7 @@ int game_resetBubsArray (game_t * game_t_ptr) {
             game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
 
             /* set all bubs to value */
-            //game_t_ptr->bubs_array[i][j] = 0 ;
+            //game_t_ptr->bubs_array[i][j] = 7 ;
         }
     }
 
@@ -317,6 +328,7 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
     /* this temp will hold the neighboring bubs */
     bub_t * bub_t_top_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
+
     /* we keep the address in memory to re-assign it after NULL is assigned to it by function game_getBubAt */
     bub_t * bub_t_top_ptr_2 = bub_t_top_ptr ;
 

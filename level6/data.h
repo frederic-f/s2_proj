@@ -16,7 +16,7 @@
 #define LAUNCHER_DIV        48 // PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations
 #define PI 3.14159265359
 
-#define VELOCITY            1.2  // bubble velocity
+#define VELOCITY            1  // bubble velocity
 #define BUB_SIZE            40 // horizontal and vertical size
 #define BUB_START_Y         457
 
@@ -29,6 +29,19 @@
 #include <SDL.h>
 #include <stdbool.h>
 
+
+struct Sys_t {
+
+    SDL_Surface * screen_srf_ptr ;
+
+    SDL_Surface * launcher_srf_ptr ;
+
+    SDL_Surface * frame_srf_ptr ;
+
+    int colorkey ; /* transparency color */
+
+};
+typedef struct Sys_t sys_t ;
 
 struct Game_t {
 
