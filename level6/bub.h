@@ -13,11 +13,11 @@
 
 int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
-void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int * currOrientation) ;
+void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
-bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
+int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 

@@ -12,9 +12,8 @@
 #define BOARD_RIGHT         520
 #define BOARD_TOP           31
 
-/* In the sprite, we have 45 images of a 187x157 picture */
 #define LAUNCHER_DIV        48 // PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations
-#define PI 3.14159265359
+#define PI                  3.14159265359
 
 #define VELOCITY            1  // bubble velocity
 #define BUB_SIZE            40 // horizontal and vertical size
@@ -38,12 +37,20 @@ struct Sys_t {
 
     SDL_Surface * frame_srf_ptr ;
 
+    SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
+
+    SDL_Rect * frame_rect_ptr ; /* to place the board frame */
+
+    SDL_Rect * launcher_rect_ptr ; /* to place the launcher */
+
     int colorkey ; /* transparency color */
 
 };
-typedef struct Sys_t sys_t ;
+typedef struct Sys_t sys_t ;/* step of x motion */
 
 struct Game_t {
+
+    int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
 
     SDL_Surface * bubs[NUM_COLOR] ;
 
@@ -59,6 +66,8 @@ struct Game_t {
 
     int bub_ny ; /* used when roof goes down */
 
+    int quit ;
+
 };
 typedef struct Game_t game_t ;
 
@@ -68,21 +77,21 @@ struct Bub_t {
 
     SDL_Surface * sprite_ptr ;
 
-    SDL_Rect position ; // position of the sprite on the window WE USE .x and .y only for the display
+    SDL_Rect * position ; /* position of the sprite on the window WE USE .x and .y only for the display */
 
     short color ;
 
-    double  x ;     // real x coordinate
+    double  x ;     /* real coordinates */
     double  y ;
 
-    int start_x ; // position on launcher
+    int start_x ; /* position on launcher */
     int start_y ;
 
     bool isLaunching ;
     bool isMoving ;
 
-    double step_x ;  // step of x motion
-    double step_y ;
+    double step_x ;  /* step of x motion */
+    double step_y ;  /* step of y motion */
 
 };
 typedef struct Bub_t bub_t ;

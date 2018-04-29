@@ -35,6 +35,9 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
 
 
+    /* bub position */
+    bub_t_ptr->position = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
     bub_t_ptr->isLaunching = false ;
 
     bub_t_ptr->isMoving = false ;
@@ -45,7 +48,7 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
-    return (1) ;
+    return (0) ;
 
 }
 
@@ -57,27 +60,27 @@ int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 
     /* return bubble to launcher */
-    bub_t_ptr->position.x = bub_t_ptr->start_x;
-    bub_t_ptr->position.y = bub_t_ptr->start_y;
+    bub_t_ptr->position->x = bub_t_ptr->start_x;
+    bub_t_ptr->position->y = bub_t_ptr->start_y;
 
     bub_t_ptr->x = bub_t_ptr->start_x;
     bub_t_ptr->y = bub_t_ptr->start_y;
 
-    return (1) ;
+    return (0) ;
 }
 
 
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
+void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
     /* launching only if bubble not moving*/
     if (!bub_t_ptr->isMoving) { // it is not moving
 
         /* if bub NOT on launcher (and NOT MOVING)
         * then return it to launcher */
-        if (bub_t_ptr->position.y != BUB_START_Y) {
+        if (bub_t_ptr->position->y != BUB_START_Y) {
 
             bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
@@ -93,7 +96,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
              * start position is PI / 2
              * we substract : (nb of orientation moved left or right (doesn't matter) from vertical) * (angle moved by each orientation of launcher)
              * */
-            double theta = (PI / 2) - ( abs(*currOrientation - 22) * (PI / LAUNCHER_DIV)) ;
+            double theta = (PI / 2) - ( abs (game_t_ptr->launcherOrientation - 22) * (PI / LAUNCHER_DIV)) ;
             //printf ("%f\n", theta) ;
 
 
@@ -101,7 +104,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
              * to right = positive : if orientation of launcher if >= 22
              * to left -> negative : if < 22
              * */
-            short direction = (*currOrientation >= 22) ? 1 : -1 ;
+            short direction = (game_t_ptr->launcherOrientation >= 22) ? 1 : -1 ;
             //printf ("%d\n", direction) ;
 
 
@@ -127,7 +130,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr, int *currOrientation) {
 /* ****************************************************************************************************************
 *
 * ************************************************************************************************************** */
-bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
+int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 {
 
     bool debug = false ;
@@ -154,7 +157,7 @@ bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 
         bub_t_ptr->isMoving = false ;
 
-        return false ;
+        return (-1) ;
     }
 
     /* 2. hit TOP */
@@ -163,7 +166,7 @@ bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 
         bub_t_ptr->isMoving = false ;
 
-        return false ;
+        return (-1) ;
     }
 
     /* 3. REBOUND left */
@@ -192,11 +195,11 @@ bool bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
         bub_t_ptr->x = *target_pos_x ;
         bub_t_ptr->y = *target_pos_y ;
 
-        bub_t_ptr->position.x = (int) bub_t_ptr->x ;
-        bub_t_ptr->position.y = (int) bub_t_ptr->y ;
+        bub_t_ptr->position->x = (int) bub_t_ptr->x ;
+        bub_t_ptr->position->y = (int) bub_t_ptr->y ;
     }
 
-    return true ;
+    return (0) ;
 
 }
 
@@ -267,7 +270,7 @@ SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
         }
     }
 
-    return false ;
+    return NULL ;
 }
 
 
@@ -318,7 +321,6 @@ bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos
     }
 
     return false ;
-
 }
 
 
@@ -327,7 +329,7 @@ bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos
 * ************************************************************************************************************** */
 bool bub_isBelowLimit (bub_t * bub_t_ptr) {
 
-    return bub_t_ptr->position.y > SCREEN_HEIGHT - LAUNCHER_HEIGHT ;
+    return bub_t_ptr->position->y > SCREEN_HEIGHT - LAUNCHER_HEIGHT ;
 }
 
 

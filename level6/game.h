@@ -11,8 +11,9 @@
 #include "data.h"
 
 
-
 int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) ;
+
+int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 int game_loadSprites (game_t * game_t_ptr, sys_t * sys_t_ptr) ;
 
@@ -34,16 +35,5 @@ int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) ;
 
 bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rect * rect_ptr) ;
 
-
-
-// TODO : put the following functions in SYST.h/.c module
-
-void HandleEvent (SDL_Event event, int * quit, int * currOrientation, bub_t * bub_t_ptr) ;
-
-SDL_Rect * getBubPositionRect (int i, int j, SDL_Rect * dumRect_ptr) ;
-
-short getRandomNumber (int max) ;
-
-void fatal (char *message) ;
 
 #endif //S2_PROJ_GAME_H
