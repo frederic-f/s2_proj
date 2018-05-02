@@ -31,9 +31,7 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
      * so we add 1 here */
     bub_t_ptr->color = getRandomNumber (NUM_COLOR) + 1 ;
 
-    /* load new sprite with random color */
-    bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
-
+    bub_setSpriteNormal (game_t_ptr, bub_t_ptr) ;
 
     /* bub position */
     bub_t_ptr->position = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
@@ -52,6 +50,18 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 }
 
+int bub_setSpriteNormal (game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+    /* load new sprite with color */
+    bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
+
+    return (0) ;
+}
+
+int bub_setSpriteExplode (bub_t * bub_t_ptr) {
+
+    return (0) ;
+}
 
 /* ****************************************************************************************************************
 *
@@ -342,4 +352,15 @@ double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_
     double dy = bub1_y - bub2_y ;
 
     return sqrt (pow (dx, 2) + pow (dy, 2)) ;
+}
+
+
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int bub_makeFall (bub_t * bub_t_ptr) {
+
+    printf ("[bub_makeFall] - ") ;
+
+    return (0) ;
 }

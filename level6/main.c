@@ -109,6 +109,11 @@ int main()
             }
         }
 
+
+        /* move falling bubs */
+        game_moveFallingBub (game_t_ptr) ;
+
+
         /* draw all the sprites and update the screen */
         sys_draw (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
     }

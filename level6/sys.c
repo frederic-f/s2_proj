@@ -138,7 +138,7 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     bub_rect.y = 0 ;
 
     /* draw moving bub */
-    SDL_BlitSurface(bub_t_ptr->sprite_ptr, &bub_rect, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
+    SDL_BlitSurface (bub_t_ptr->sprite_ptr, &bub_rect, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
 
 
     /* draw non-moving bubs */
@@ -166,10 +166,41 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
                 dumRect_ptr = sys_getBubPositionRect(i, j, dumRect_ptr);
 
                 /* display */
-                SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->bubs_array[i][j] -1], &bub_rect, sys_t_ptr->screen_srf_ptr, dumRect_ptr);
+                SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->bubs_array[i][j] - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, dumRect_ptr);
             }
         }
     }
+
+
+
+
+
+    /* draw falling bubs*/
+
+    if (game_t_ptr->bub_numFallingBubs > 0) {
+
+        int i ;
+
+        printf ("[sys_draw] Num of bubs falling %d\n", game_t_ptr -> bub_numFallingBubs) ;
+
+        for (i = 0 ; i < (game_t_ptr -> bub_numFallingBubs) ; i += 1) {
+
+
+            struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
+
+            printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
+
+            SDL_BlitSurface (bub_ptr->sprite_ptr, &bub_rect, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
+
+        }
+
+        //game_t_ptr->bub_numFallingBubs = 0 ;
+    }
+
+
+
+
+
 
     free (dumRect_ptr) ;
 
@@ -201,7 +232,7 @@ int sys_cleanUp (sys_t * sys_t_ptr) {
 
 /* ****************************************************************************************************************
 * function that receives [i=lig][j=col] of a cell from the bubs_array
-* returns a _ptr to SDL_Rect object with coords /x and y OF TOP LEFT CORNER/
+* returns the _ptr to SDL_Rect object updated with coords /x and y OF TOP LEFT CORNER/
 * so that main program can position the bub
 * WARNING : coords are for top left corner
 * ************************************************************************************************************** */
@@ -233,7 +264,7 @@ short getRandomNumber(int max) {
     /* Initializes random number generator */
     srand ((unsigned) time (&t)) ;
 
-    /* Generates numbers from 0 to NUM_COLOR */
+    /* Generates numbers from 0 to max */
     return rand() % max ;
 }
 

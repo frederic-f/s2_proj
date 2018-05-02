@@ -13,6 +13,10 @@
 
 int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
+int bub_setSpriteNormal (game_t * game_t_ptr, bub_t * bub_t_ptr) ;
+
+int bub_setSpriteExplode (bub_t * bub_t_ptr) ;
+
 void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
@@ -26,5 +30,7 @@ bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos
 bool bub_isBelowLimit (bub_t * bub_t_ptr) ;
 
 double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) ;
+
+int bub_makeFall (bub_t * bub_t_ptr) ;
 
 #endif

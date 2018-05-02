@@ -29,50 +29,6 @@
 #include <stdbool.h>
 
 
-struct Sys_t {
-
-    SDL_Surface * screen_srf_ptr ;
-
-    SDL_Surface * launcher_srf_ptr ;
-
-    SDL_Surface * frame_srf_ptr ;
-
-    SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
-
-    SDL_Rect * frame_rect_ptr ; /* to place the board frame */
-
-    SDL_Rect * launcher_rect_ptr ; /* to place the launcher */
-
-    int colorkey ; /* transparency color */
-
-};
-typedef struct Sys_t sys_t ;/* step of x motion */
-
-struct Game_t {
-
-    int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
-
-    SDL_Surface * bubs[NUM_COLOR] ;
-
-    int * * bubs_array ; /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
-
-    int * * * bub_array_centers ; /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
-
-    int * * bub_connected_component ; /* array to keep track of connected components */
-
-    int * * bub_fifo ; /* queue to keep track of bubs whose connexity is to check */
-
-    int fifoHead, fifoTail ; /* indexes for bub_fifo */
-
-    int bub_ny ; /* used when roof goes down */
-
-    int quit ;
-
-};
-typedef struct Game_t game_t ;
-
-
-
 struct Bub_t {
 
     SDL_Surface * sprite_ptr ;
@@ -95,6 +51,57 @@ struct Bub_t {
 
 };
 typedef struct Bub_t bub_t ;
+
+
+
+struct Sys_t {
+
+    SDL_Surface * screen_srf_ptr ;
+
+    SDL_Surface * launcher_srf_ptr ;
+
+    SDL_Surface * frame_srf_ptr ;
+
+    SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
+
+    SDL_Rect * frame_rect_ptr ; /* to place the board frame */
+
+    SDL_Rect * launcher_rect_ptr ; /* to place the launcher */
+
+    int colorkey ; /* transparency color */
+
+};
+typedef struct Sys_t sys_t ;/* step of x motion */
+
+
+
+struct Game_t {
+
+    int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
+
+    SDL_Surface * bubs[NUM_COLOR] ;
+
+    int * * bubs_array ; /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
+
+    int * * * bub_array_centers ; /* all possible spaces for a bub /centers coordinates/ are kept track of in a pointer-syle 3-dimension array */
+
+    int * * bub_connected_component ; /* array to keep track of connected components */
+
+    int * * bub_fifo ; /* queue to keep track of bubs whose connexity is to check */
+
+    int fifoHead, fifoTail ; /* indexes for bub_fifo */
+
+    int bub_ny ; /* used when roof goes down */
+
+    int quit ;
+
+    struct Bub_t * * bub_fallingBubs ; /* to keep track of bub falling */
+
+    int bub_numFallingBubs ;
+
+};
+typedef struct Game_t game_t ;
+
 
 
 #endif //S2_PROJ_CONSTANTS_H
