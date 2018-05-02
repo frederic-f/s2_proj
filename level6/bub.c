@@ -58,7 +58,7 @@ int bub_setSpriteNormal (game_t * game_t_ptr, bub_t * bub_t_ptr) {
     return (0) ;
 }
 
-int bub_setSpriteExplode (bub_t * bub_t_ptr) {
+int bub_setSpriteExploding (bub_t * bub_t_ptr) {
 
     return (0) ;
 }

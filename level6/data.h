@@ -45,6 +45,7 @@ struct Bub_t {
 
     bool isLaunching ;
     bool isMoving ;
+    bool isExploding ;
 
     double step_x ;  /* step of x motion */
     double step_y ;  /* step of y motion */
@@ -80,6 +81,8 @@ struct Game_t {
     int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
 
     SDL_Surface * bubs[NUM_COLOR] ;
+
+    SDL_Surface * bubsEx[NUM_COLOR] ; /* exploding sprite : 30 images*/
 
     int * * bubs_array ; /* non-moving bubs /presence/ are kept track of in a pointer-style 2-dimension array */
 

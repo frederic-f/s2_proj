@@ -124,27 +124,43 @@ int game_loadSprites (game_t * game_t_ptr, sys_t * sys_t_ptr) {
     /* Loading the BUBS */
     temp = SDL_LoadBMP("img/bub_black.bmp");
     game_t_ptr->bubs[0] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_black.bmp");
+    game_t_ptr->bubsEx[0] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_blue.bmp");
     game_t_ptr->bubs[1] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_blue.bmp");
+    game_t_ptr->bubsEx[1] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_green.bmp");
     game_t_ptr->bubs[2] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_green.bmp");
+    game_t_ptr->bubsEx[2] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_orange.bmp");
     game_t_ptr->bubs[3] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_orange.bmp");
+    game_t_ptr->bubsEx[3] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_purple.bmp");
     game_t_ptr->bubs[4] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_purple.bmp");
+    game_t_ptr->bubsEx[4] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_red.bmp");
     game_t_ptr->bubs[5] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_red.bmp");
+    game_t_ptr->bubsEx[5] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_white.bmp");
     game_t_ptr->bubs[6] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_white.bmp");
+    game_t_ptr->bubsEx[6] = SDL_DisplayFormat(temp) ;
 
     temp = SDL_LoadBMP("img/bub_yellow.bmp");
     game_t_ptr->bubs[7] = SDL_DisplayFormat(temp) ;
+    temp = SDL_LoadBMP("img/bubex_yellow.bmp");
+    game_t_ptr->bubsEx[7] = SDL_DisplayFormat(temp) ;
 
 
     SDL_FreeSurface(temp) ;
@@ -154,6 +170,7 @@ int game_loadSprites (game_t * game_t_ptr, sys_t * sys_t_ptr) {
     int k ;
     for (k = 0 ; k < NUM_COLOR ; k += 1) {
         sys_makeTransparent (sys_t_ptr, game_t_ptr->bubs[k]);
+        sys_makeTransparent (sys_t_ptr, game_t_ptr->bubsEx[k]);
     }
 
 
@@ -326,6 +343,7 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
     }
 
     /* color-connexity check with bub that arrived */
+    /* will update fifo */
     game_checkConnexity(game_t_ptr, bubJustPlaced_rect, true);
 
     if (debug) {
@@ -348,6 +366,9 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             /* add bub to fallingBubs*/
             /* create bub_t pointer */
 
+
+            /* TODO game_addFallingBub (game_t_ptr, color, rect_ptr, bool isExploding) */
+
             struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[game_t_ptr->bub_numFallingBubs] ;
 
             /* get color from bubs_array*/
@@ -360,6 +381,8 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             rect_ptr = sys_getBubPositionRect(game_t_ptr->bub_fifo[i][0], game_t_ptr->bub_fifo[i][1], rect_ptr) ;
 
             bub_ptr->position = rect_ptr ;
+
+            bub_ptr->isExploding = true ;
 
             /* update number of falling bubs */
             game_t_ptr->bub_numFallingBubs += 1 ;
@@ -462,6 +485,8 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             if ((game_t_ptr->bubs_array[i][j] > 0) && (game_t_ptr->bub_connected_component[i][j] == 0) ) {
 
                 game_t_ptr->bubs_array[i][j] = 0 ;
+
+                /* TODO : add bub to fallingBubs */
             }
         }
     }
@@ -475,6 +500,8 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
     return (0) ;
 }
+
+
 
 /* ****************************************************************************************************************
 *   Connexity function used for :

@@ -15,7 +15,7 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
 int bub_setSpriteNormal (game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
-int bub_setSpriteExplode (bub_t * bub_t_ptr) ;
+int bub_setSpriteExploding (bub_t * bub_t_ptr) ;
 
 void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) ;
 
