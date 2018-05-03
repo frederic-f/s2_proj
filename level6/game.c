@@ -83,9 +83,12 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
     for (i = 0 ; i < (BUB_NY * BUB_NX) ; i += 1) {
 
+        /* TODO put this in bub_init */
         game_t_ptr->bub_fallingBubs[i] = (struct Bub_t *) malloc (sizeof (struct Bub_t)) ;
         /* bub position */
         game_t_ptr->bub_fallingBubs[i]->position = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+        /* bub spriteFrame */
+        game_t_ptr->bub_fallingBubs[i]->spriteFrame = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
     }
 
 
@@ -355,8 +358,6 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
      * if 3 bubs or more are connected...*/
     if (game_t_ptr->fifoHead >= 3) {
 
-
-
         /* delete these bubs */
         int i ;
         for (i = 0; i < game_t_ptr->fifoHead; i += 1) {
@@ -364,33 +365,15 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             //printf ("[game_clean] Deleted bub at y=%d x=%d\n", game_t_ptr->bub_fifo[i][0], game_t_ptr->bub_fifo[i][1]) ;
 
             /* add bub to fallingBubs*/
-            /* create bub_t pointer */
+            int color = game_t_ptr->bubs_array[game_t_ptr->bub_fifo[i][0]][game_t_ptr->bub_fifo[i][1]] ;
+            int line = game_t_ptr->bub_fifo[i][0] ;
+            int col = game_t_ptr->bub_fifo[i][1] ;
 
-
-            /* TODO game_addFallingBub (game_t_ptr, color, rect_ptr, bool isExploding) */
-
-            struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[game_t_ptr->bub_numFallingBubs] ;
-
-            /* get color from bubs_array*/
-            bub_ptr->color = game_t_ptr->bubs_array[game_t_ptr->bub_fifo[i][0]][game_t_ptr->bub_fifo[i][1]] ;
-            bub_setSpriteNormal (game_t_ptr, bub_ptr) ;
-
-            /* get the coordinates of bub */
-            SDL_Rect * rect_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
-
-            rect_ptr = sys_getBubPositionRect(game_t_ptr->bub_fifo[i][0], game_t_ptr->bub_fifo[i][1], rect_ptr) ;
-
-            bub_ptr->position = rect_ptr ;
-
-            bub_ptr->isExploding = true ;
-
-            /* update number of falling bubs */
-            game_t_ptr->bub_numFallingBubs += 1 ;
+            game_addFallingBub (game_t_ptr, color, line, col, true) ;
 
             /* delete bub from bubs_array */
             game_t_ptr->bubs_array[game_t_ptr->bub_fifo[i][0]][game_t_ptr->bub_fifo[i][1]] = 0 ;
         }
-
     }
 
     /* reset head, tail, bub_connected */
@@ -484,9 +467,15 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
              * we delete it (0) */
             if ((game_t_ptr->bubs_array[i][j] > 0) && (game_t_ptr->bub_connected_component[i][j] == 0) ) {
 
-                game_t_ptr->bubs_array[i][j] = 0 ;
+                /* add bub to fallingBubs*/
+                int color = game_t_ptr->bubs_array[i][j] ;
+                int line = i ;
+                int col = j ;
 
-                /* TODO : add bub to fallingBubs */
+                game_addFallingBub (game_t_ptr, color, line, col, false) ;
+
+                /* delete bub from bubs_array */
+                game_t_ptr->bubs_array[i][j] = 0 ;
             }
         }
     }
@@ -501,7 +490,52 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
     return (0) ;
 }
 
+/* ****************************************************************************************************************
+*
+* ************************************************************************************************************** */
+int game_addFallingBub (game_t * game_t_ptr, int color, int line, int col, bool isExploding) {
 
+    /* access the next fallingBub in array */
+    struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[game_t_ptr->bub_numFallingBubs] ;
+
+    /* set color from bubs_array*/
+    bub_ptr->color = color ;
+
+    /* set sprite */
+    if (isExploding) {
+        bub_setSpriteExploding (game_t_ptr, bub_ptr) ;
+
+        bub_ptr->spriteFrame->w = BUB_EX_SIZE ;
+        bub_ptr->spriteFrame->h = BUB_EX_SIZE ;
+        bub_ptr->spriteFrame->x = 0 ;
+        bub_ptr->spriteFrame->y = 0 ;
+
+
+    } else {
+        bub_setSpriteNormal (game_t_ptr, bub_ptr) ;
+
+        bub_ptr->spriteFrame->w = BUB_SIZE ;
+        bub_ptr->spriteFrame->h = BUB_SIZE ;
+        bub_ptr->spriteFrame->x = 0 ;
+        bub_ptr->spriteFrame->y = 0 ;
+    }
+
+    /* set the coordinates of bub */
+    SDL_Rect * rect_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
+
+    rect_ptr = sys_getBubPositionRect (line, col, rect_ptr) ;
+
+    bub_ptr->position = rect_ptr ;
+
+    if (isExploding) {
+        bub_ptr->isExploding = true ;
+    }
+
+    /* update number of falling bubs */
+    game_t_ptr->bub_numFallingBubs += 1 ;
+
+    return (0) ;
+}
 
 /* ****************************************************************************************************************
 *   Connexity function used for :
@@ -798,19 +832,26 @@ int game_moveFallingBub (game_t * game_t_ptr) {
 
     for (i = 0; i < game_t_ptr->bub_numFallingBubs ; i += 1) {
 
-        /* slow down the fall */
-        if (i % 1 == 0) {
+        /* we use a shorter variable for clarity */
+        struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
 
-            game_t_ptr->bub_fallingBubs[i]->position->y += 1;
+        /* slow down the fall if needed */
+        bub_ptr->position->y += VELOCITY;
+
+        /* if exploding, we also change the frame
+         * the first condition is for explosion velocity */
+        if ((bub_ptr->position->y % EXPLOSION_VELOCITY == 0) && (bub_ptr->isExploding) && (bub_ptr->spriteFrame->y < 1506)) {
+            bub_ptr->spriteFrame->y += BUB_EX_SIZE ;
         }
 
+
         /* if the bub reach limit */
-        if (game_t_ptr->bub_fallingBubs[i]->position->y > SCREEN_HEIGHT) {
+        if (bub_ptr->position->y > SCREEN_HEIGHT) {
 
             /* we delete this bub */
 
             /* we replace the bub with the last bub in array */
-            game_t_ptr->bub_fallingBubs[i] = game_t_ptr->bub_fallingBubs[game_t_ptr->bub_numFallingBubs - 1] ;
+            bub_ptr = game_t_ptr->bub_fallingBubs[game_t_ptr->bub_numFallingBubs - 1] ;
 
             /* we decrement falling bub count */
             game_t_ptr->bub_numFallingBubs -= 1 ;

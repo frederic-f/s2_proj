@@ -138,7 +138,7 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     bub_rect.y = 0 ;
 
     /* draw moving bub */
-    SDL_BlitSurface (bub_t_ptr->sprite_ptr, &bub_rect, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
+    SDL_BlitSurface (bub_t_ptr->sprite_ptr, bub_t_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
 
 
     /* draw non-moving bubs */
@@ -171,12 +171,7 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
         }
     }
 
-
-
-
-
-    /* draw falling bubs*/
-
+    /* draw falling bubs */
     if (game_t_ptr->bub_numFallingBubs > 0) {
 
         int i ;
@@ -190,20 +185,12 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
             printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
 
-            SDL_BlitSurface (bub_ptr->sprite_ptr, &bub_rect, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
+            SDL_BlitSurface (bub_ptr->sprite_ptr, bub_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
 
         }
-
-        //game_t_ptr->bub_numFallingBubs = 0 ;
     }
 
-
-
-
-
-
     free (dumRect_ptr) ;
-
 
     /* update the screen */
     SDL_UpdateRect(sys_t_ptr->screen_srf_ptr, 0, 0, 0, 0);

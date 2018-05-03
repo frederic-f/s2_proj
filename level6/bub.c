@@ -36,6 +36,15 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     /* bub position */
     bub_t_ptr->position = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
+    /* bub spriteFrame */
+    bub_t_ptr->spriteFrame = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    bub_t_ptr->spriteFrame->w = BUB_SIZE ;
+    bub_t_ptr->spriteFrame->h = BUB_SIZE ;
+    bub_t_ptr->spriteFrame->x = 0 ;
+    bub_t_ptr->spriteFrame->y = 0 ;
+
+    /* */
     bub_t_ptr->isLaunching = false ;
 
     bub_t_ptr->isMoving = false ;
@@ -58,7 +67,10 @@ int bub_setSpriteNormal (game_t * game_t_ptr, bub_t * bub_t_ptr) {
     return (0) ;
 }
 
-int bub_setSpriteExploding (bub_t * bub_t_ptr) {
+int bub_setSpriteExploding (game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+    /* load new sprite with color */
+    bub_t_ptr->sprite_ptr = game_t_ptr->bubsEx[bub_t_ptr->color - 1] ;
 
     return (0) ;
 }

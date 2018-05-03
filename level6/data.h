@@ -12,15 +12,18 @@
 #define BOARD_RIGHT         520
 #define BOARD_TOP           31
 
-#define LAUNCHER_DIV        48 // PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations
+#define LAUNCHER_DIV        48 /*PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations*/
 #define PI                  3.14159265359
 
-#define VELOCITY            1  // bubble velocity
-#define BUB_SIZE            40 // horizontal and vertical size
+#define VELOCITY            1  /*bubble velocity*/
+#define EXPLOSION_VELOCITY  30
+
+#define BUB_SIZE            40 /*horizontal and vertical size*/
+#define BUB_EX_SIZE         54 /* size of exploding bub */
 #define BUB_START_Y         457
 
-#define BUB_NX              8       // max number of bubs in hrztl direction
-#define BUB_NY              11      // vrtcl
+#define BUB_NX              8       /* max number of bubs in hrztl direction */
+#define BUB_NY              11      /* vrtcl */
 
 #define NUM_COLOR	        8
 
@@ -34,6 +37,8 @@ struct Bub_t {
     SDL_Surface * sprite_ptr ;
 
     SDL_Rect * position ; /* position of the sprite on the window WE USE .x and .y only for the display */
+
+    SDL_Rect * spriteFrame ; /* position of the sprite on the window WE USE .x and .y only for the display */
 
     short color ;
 
