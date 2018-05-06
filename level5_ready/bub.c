@@ -110,7 +110,7 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
         /* launching the bub */
         bub_t_ptr->isMoving = true;
-        
+
         /* launching is finished */
         bub_t_ptr->isLaunching = false;
     }
