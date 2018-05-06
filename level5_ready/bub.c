@@ -78,49 +78,40 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     /* launching only if bubble not moving*/
     if (!bub_t_ptr->isMoving) { // it is not moving
 
-        /* if bub NOT on launcher (and NOT MOVING)
-        * then return it to launcher */
-        if (bub_t_ptr->position->y != BUB_START_Y) {
+        /* Bub is ON LAUNCHER
+        * bubble starts moving from launcher*/
 
-            bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
+        /* let's calculate step_x and step_y*/
 
-        } else {
-            /* Bub is ON LAUNCHER
-            * bubble starts moving from launcher*/
+        /* x and y motions are calculated according to angle */
 
-            /* let's calculate step_x and step_y*/
-
-            /* x and y motions are calculated according to angle */
-
-            /* theta angle = angle from horizontal
-             * start position is PI / 2
-             * we substract : (nb of orientation moved left or right (doesn't matter) from vertical) * (angle moved by each orientation of launcher)
-             * */
-            double theta = (PI / 2) - ( abs (game_t_ptr->launcherOrientation - 22) * (PI / LAUNCHER_DIV)) ;
-            //printf ("%f\n", theta) ;
+        /* theta angle = angle from horizontal
+         * start position is PI / 2
+         * we substract : (nb of orientation moved left or right (doesn't matter) from vertical) * (angle moved by each orientation of launcher)
+         * */
+        double theta = (PI / 2) - ( abs (game_t_ptr->launcherOrientation - 22) * (PI / LAUNCHER_DIV)) ;
+        //printf ("%f\n", theta) ;
 
 
-            /* direction
-             * to right = positive : if orientation of launcher if >= 22
-             * to left -> negative : if < 22
-             * */
-            short direction = (game_t_ptr->launcherOrientation >= 22) ? 1 : -1 ;
-            //printf ("%d\n", direction) ;
+        /* direction
+         * to right = positive : if orientation of launcher if >= 22
+         * to left -> negative : if < 22
+         * */
+        short direction = (game_t_ptr->launcherOrientation >= 22) ? 1 : -1 ;
+        //printf ("%d\n", direction) ;
 
 
-            /* steps in x and y
-             * reference is one unit in the direction of movement
-             * x and y are calculated relative to this reference
-             * */
-            bub_t_ptr->step_x = cos(theta) * VELOCITY * direction ;
-            bub_t_ptr->step_y = sin(theta) * VELOCITY ;
-            //printf ("%f\n", step_y) ;
+        /* steps in x and y
+         * reference is one unit in the direction of movement
+         * x and y are calculated relative to this reference
+         * */
+        bub_t_ptr->step_x = cos(theta) * VELOCITY * direction ;
+        bub_t_ptr->step_y = sin(theta) * VELOCITY ;
 
-            /* launching the bub */
-            bub_t_ptr->isMoving = true;
-        }
-
-        /* in all cases, launching is finished */
+        /* launching the bub */
+        bub_t_ptr->isMoving = true;
+        
+        /* launching is finished */
         bub_t_ptr->isLaunching = false;
     }
 
