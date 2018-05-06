@@ -108,6 +108,8 @@ int sys_makeTransparent (sys_t * sys_t_ptr, SDL_Surface * surf_ptr) {
 int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
+    bool debug = false ;
+
     /* cache */
     /* cache will be black */
     int color = SDL_MapRGB(sys_t_ptr->screen_srf_ptr->format, 0, 0, 0) ;
@@ -176,14 +178,16 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
         int i ;
 
-        printf ("[sys_draw] Num of bubs falling %d\n", game_t_ptr -> bub_numFallingBubs) ;
+        if (debug)
+            printf ("[sys_draw] Num of bubs falling %d\n", game_t_ptr -> bub_numFallingBubs) ;
 
         for (i = 0 ; i < (game_t_ptr -> bub_numFallingBubs) ; i += 1) {
 
 
             struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
 
-            printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
+            if (debug)
+                printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
 
             SDL_BlitSurface (bub_ptr->sprite_ptr, bub_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
 

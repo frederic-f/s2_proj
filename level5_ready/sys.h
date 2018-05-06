@@ -29,7 +29,5 @@ SDL_Rect * sys_getBubPositionRect (int i, int j, SDL_Rect * dumRect_ptr) ;
 
 short getRandomNumber (int max) ;
 
-void fatal (char *message) ;
-
 
 #endif //S2_PROJ_SYS_H

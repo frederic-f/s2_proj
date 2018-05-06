@@ -82,6 +82,9 @@ int main()
                 /* if it is game over... */
                 if (bub_isBelowLimit (bub_t_ptr)) {
 
+                    /* game over message */
+                    printf ("GAME OVER :-(\n") ;
+
                     /* we reset */
                     game_newGame (game_t_ptr, bub_t_ptr) ;
 

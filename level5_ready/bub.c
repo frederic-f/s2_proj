@@ -199,6 +199,9 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
         bub_t_ptr->position->y = (int) bub_t_ptr->y ;
     }
 
+    free (target_pos_x) ;
+    free (target_pos_y) ;
+
     return (0) ;
 
 }
@@ -291,9 +294,7 @@ bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos
 
         j_max = (i % 2 == 0) ? 8 : 7 ;
 
-        for (j = 0 ; j < /* ****************************************************************************************************************
-*
-* ************************************************************************************************************** */j_max ; j += 1) {
+        for (j = 0 ; j < j_max ; j += 1) {
 
             /* if there is a bub at this position */
             if (game_t_ptr->bubs_array[i][j] > 0) {

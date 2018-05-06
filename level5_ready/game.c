@@ -18,7 +18,7 @@
 * ************************************************************************************************************** */
 int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
-    bool debug = true ;
+    bool debug = false ;
 
     int i ; /* for malloc loops */
 

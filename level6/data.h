@@ -16,7 +16,8 @@
 #define PI                  3.14159265359
 
 #define VELOCITY            1  /*bubble velocity*/
-#define EXPLOSION_VELOCITY  30
+#define EXPLOSION_VELOCITY  30 /* how slow the explosion occurs : larger number => slower explosion */
+#define EXPLOSION_COEFF     30.0 /* determines trajectory of exploding bub : y = - (1 / COEFF).x + COEFF */
 
 #define BUB_SIZE            40 /*horizontal and vertical size*/
 #define BUB_EX_SIZE         54 /* size of exploding bub */
@@ -55,6 +56,8 @@ struct Bub_t {
     double step_x ;  /* step of x motion */
     double step_y ;  /* step of y motion */
 
+    double explosion_x ; /* for trajectory of exploding bub */
+    double explosion_y ;
 };
 typedef struct Bub_t bub_t ;
 

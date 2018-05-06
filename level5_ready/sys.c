@@ -73,7 +73,7 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
 
     /* Frame of board */
-    temp  = SDL_LoadBMP("frame_1p.bmp");
+    temp  = SDL_LoadBMP("img/frame_1p.bmp");
     sys_t_ptr->frame_srf_ptr = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
 
@@ -81,7 +81,7 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
 
     /* Launcher */
-    temp = SDL_LoadBMP("frame_launcher.bmp");
+    temp = SDL_LoadBMP("img/frame_launcher.bmp");
     sys_t_ptr->launcher_srf_ptr = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
 
@@ -284,18 +284,4 @@ void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
             }
             break;
     }
-}
-
-
-/* ****************************************************************************************************************
-*
-* ************************************************************************************************************** */
-
-void fatal (char *message) {
-    char error_message[100] ;
-
-    strcpy (error_message, "[!!] Fatal Error\n") ;
-    strncat (error_message, message, 83) ;
-    perror (error_message) ;
-    //exit (-1) ;
 }

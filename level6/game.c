@@ -199,10 +199,12 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
             int col = j + getRandomNumber(NUM_COLOR) ;
             col = (col > 8) ? 8 : col ;
-            //col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
+            col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
 
             /* set whole lines of bubs here if you want to test */
-            game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
+            //game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
+
+            game_t_ptr->bubs_array[i][j] = (i==0 && (j ==0 || j==1 || j==2)) ? col : 0 ;
 
             /* set all bubs to value */
             //game_t_ptr->bubs_array[i][j] = 7 ;
@@ -510,6 +512,13 @@ int game_addFallingBub (game_t * game_t_ptr, int color, int line, int col, bool 
         bub_ptr->spriteFrame->x = 0 ;
         bub_ptr->spriteFrame->y = 0 ;
 
+        /* exploding bubs have special trajectory */
+        bub_ptr->explosion_x = - EXPLOSION_COEFF ;
+        bub_ptr->explosion_y = 0.0 ;
+
+        /* step_y < 0 : climbing part of parabole
+         * step_y > 0 : descending part of parabole */
+        bub_ptr->step_y = -1 ;
 
     } else {
         bub_setSpriteNormal (game_t_ptr, bub_ptr) ;
@@ -526,6 +535,10 @@ int game_addFallingBub (game_t * game_t_ptr, int color, int line, int col, bool 
     rect_ptr = sys_getBubPositionRect (line, col, rect_ptr) ;
 
     bub_ptr->position = rect_ptr ;
+
+    bub_ptr->x = rect_ptr->x ;
+    bub_ptr->y = rect_ptr->y ;
+
 
     if (isExploding) {
         bub_ptr->isExploding = true ;
@@ -823,7 +836,7 @@ bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rec
 }
 
 /* ****************************************************************************************************************
-*
+*   TODO put this function into sys_ (this is not related to game...)
 * ************************************************************************************************************** */
 int game_moveFallingBub (game_t * game_t_ptr) {
 
@@ -835,8 +848,56 @@ int game_moveFallingBub (game_t * game_t_ptr) {
         /* we use a shorter variable for clarity */
         struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
 
-        /* slow down the fall if needed */
-        bub_ptr->position->y += VELOCITY;
+        /* exploding bubs (color-connexity) and non-exploding bub (roof-connexity) dont have the same falling trajectory */
+
+        if (bub_ptr->isExploding) {
+
+            /*if (bub_ptr->explosion_y == -59) {
+                if (bub_ptr->spriteFrame->y == 1506) {
+                    bub_ptr->step_y = 1 ;
+                } else {
+                    bub_ptr->step_y = 0 ;
+                }
+            }*/
+
+
+            if (bub_ptr->explosion_y == -59)
+                    bub_ptr->step_y = 1 ;
+
+            bub_ptr->explosion_y += bub_ptr->step_y ;
+
+
+            bub_ptr->position->y += bub_ptr->step_y * VELOCITY ;
+
+
+
+
+
+            /*printf ("[game_move] (before) Bub # %d - Pos x: %d \n", i, bub_ptr->position->x ) ;
+            printf ("[game_move] Relative x %f - Relative y: %f \n", bub_ptr->explosion_x, bub_ptr->explosion_y ) ;
+
+
+
+            *//* we calculate trajectory in double *//*
+            bub_ptr->explosion_y += bub_ptr->step_y ;
+            bub_ptr->explosion_x = bub_ptr->step_y * sqrt ( pow(EXPLOSION_COEFF, 2) + (bub_ptr->explosion_y * EXPLOSION_COEFF)) ;
+
+            *//* update real coordinates of bub *//*
+            bub_ptr->x = bub_ptr->x + bub_ptr->explosion_x + EXPLOSION_COEFF ;
+            bub_ptr->y = bub_ptr->y + bub_ptr->explosion_y ;
+
+            *//* set int coordinates used to move bub*//*
+            bub_ptr->position->x = (int) bub_ptr->x ;
+            bub_ptr->position->y = (int) bub_ptr->y ;*/
+
+           // printf ("[game_move] (after)  Bub # %d - Pos x: %d \n", i, bub_ptr->position->x ) ;
+
+        } else {
+
+            /* bub falling straight down */
+            bub_ptr->position->y += VELOCITY;
+        }
+
 
         /* if exploding, we also change the frame
          * the first condition is for explosion velocity */
@@ -859,3 +920,4 @@ int game_moveFallingBub (game_t * game_t_ptr) {
     }
     return (0) ;
 }
+

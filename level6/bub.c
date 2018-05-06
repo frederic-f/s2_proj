@@ -221,6 +221,9 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
         bub_t_ptr->position->y = (int) bub_t_ptr->y ;
     }
 
+    free (target_pos_x) ;
+    free (target_pos_y) ;
+
     return (0) ;
 
 }
