@@ -31,6 +31,5 @@ bool bub_isBelowLimit (bub_t * bub_t_ptr) ;
 
 double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) ;
 
-int bub_makeFall (bub_t * bub_t_ptr) ;
 
 #endif

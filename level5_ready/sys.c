@@ -305,7 +305,7 @@ short getRandomNumber(int max) {
 
 
 /* ****************************************************************************************************************
-*   Handles the SDL events
+*   Detects SDL events
 * ************************************************************************************************************** */
 void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
 {

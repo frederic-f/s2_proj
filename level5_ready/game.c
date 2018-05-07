@@ -87,8 +87,9 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
     return (0) ;
 }
 
-
-
+/* ****************************************************************************************************************
+*   Reinitializes game
+* ************************************************************************************************************** */
 int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
     /* launcher is vertical by default */
@@ -592,7 +593,7 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect, boo
 }
 
 /* ****************************************************************************************************************
-*   gets the coordinate of an hypothetical bub
+*   Gets the coordinate of an hypothetical bub
  *   if there is a bub, and the bub matches the conditions : bub is added to connexity table
 * ************************************************************************************************************** */
 int game_spotCheckConnexity (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, bub_t * bub_t_neighbour_ptr_2, SDL_Rect * bubCoord_rect, bool colorConnexity, short colorForConnexity) {
