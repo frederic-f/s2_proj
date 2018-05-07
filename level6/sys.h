@@ -19,7 +19,7 @@ int sys_makeTransparent (sys_t * sys_t_ptr, SDL_Surface * surf_ptr) ;
 
 int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
-int sys_cleanUp (sys_t * sys_t_ptr) ;
+int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 
 void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
@@ -28,8 +28,6 @@ SDL_Rect * sys_getBubPositionRect (int i, int j, SDL_Rect * dumRect_ptr) ;
 
 
 short getRandomNumber (int max) ;
-
-void fatal (char *message) ;
 
 
 #endif //S2_PROJ_SYS_H

@@ -48,6 +48,7 @@ struct Sys_t {
 };
 typedef struct Sys_t sys_t ;/* step of x motion */
 
+
 struct Game_t {
 
     int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
@@ -70,7 +71,6 @@ struct Game_t {
 
 };
 typedef struct Game_t game_t ;
-
 
 
 struct Bub_t {

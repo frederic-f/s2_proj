@@ -82,6 +82,9 @@ int main()
                 /* if it is game over... */
                 if (bub_isBelowLimit (bub_t_ptr)) {
 
+                    /* game over message */
+                    printf ("GAME OVER :-(\n") ;
+
                     /* we reset */
                     game_newGame (game_t_ptr, bub_t_ptr) ;
 
@@ -102,6 +105,16 @@ int main()
                     game_cleanBoard (game_t_ptr, bubJustPlaced_rect) ;
 
                     free (bubJustPlaced_rect) ;
+
+                    /* check if game won */
+                    if (game_checkVictory (game_t_ptr)) {
+
+                        /* victory message */
+                        printf ("VICTORY :-)\n") ;
+
+                        /* we reset */
+                        game_newGame (game_t_ptr, bub_t_ptr) ;
+                    }
 
                     /* return bub to launcher */
                     bub_init (bub_t_ptr, game_t_ptr);

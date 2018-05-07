@@ -35,5 +35,6 @@ int game_addBubConnected (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) ;
 
 bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rect * rect_ptr) ;
 
+bool game_checkVictory (game_t * game_t_ptr) ;
 
 #endif //S2_PROJ_GAME_H

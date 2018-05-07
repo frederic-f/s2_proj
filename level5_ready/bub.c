@@ -13,10 +13,8 @@
 #include "bub.h"
 
 
-
-
 /* ****************************************************************************************************************
-*
+*   Iniiialization
 * ************************************************************************************************************** */
 int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
@@ -54,7 +52,7 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Return moving bub to launcher
 * ************************************************************************************************************** */
 int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
@@ -71,7 +69,7 @@ int bub_getOnLauncher (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Launch bub (following launch event)
 * ************************************************************************************************************** */
 void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
@@ -119,7 +117,8 @@ void bub_launch (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Try to move bub :
+ *   if not possible (collision with ceiling or other bub): returns -1
 * ************************************************************************************************************** */
 int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 {
@@ -199,7 +198,7 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 
 
 /* ****************************************************************************************************************
-*
+*   Place the moving bub into the closest empty spot
 * ************************************************************************************************************** */
 SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
@@ -269,7 +268,7 @@ SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Checks if moving bub is colliding with a non-moving bub
 * ************************************************************************************************************** */
 bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos_x, double *target_pos_y) {
 
@@ -317,7 +316,7 @@ bool bub_isColliding (bub_t * bub_t_ptr, game_t * game_t_ptr, double *target_pos
 
 
 /* ****************************************************************************************************************
-*
+*   Checks if bub below launch limit
 * ************************************************************************************************************** */
 bool bub_isBelowLimit (bub_t * bub_t_ptr) {
 
@@ -326,7 +325,7 @@ bool bub_isBelowLimit (bub_t * bub_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Helper function that calculates the distances between the centers of two bubs
 * ************************************************************************************************************** */
 double bub_getDistanceBetweenTwoBubs (double bub1_x, double bub1_y, double bub2_x, double bub2_y) {
 

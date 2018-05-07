@@ -921,3 +921,26 @@ int game_moveFallingBub (game_t * game_t_ptr) {
     return (0) ;
 }
 
+/* ****************************************************************************************************************
+*   Checks if there are bubs left on board
+* ************************************************************************************************************** */
+bool game_checkVictory (game_t * game_t_ptr) {
+
+    /* loop through bubs_array */
+    int i, j ;
+
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            if (game_t_ptr->bubs_array[i][j] != 0) {
+                return false ;
+            }
+        }
+    }
+
+    return true ;
+}

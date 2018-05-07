@@ -14,7 +14,7 @@
 
 
 /* ****************************************************************************************************************
-*
+*   Initialization
 * ************************************************************************************************************** */
 int sys_init (sys_t * sys_t_ptr) {
 
@@ -65,7 +65,7 @@ int sys_init (sys_t * sys_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Load Sprites controlled by sys
 * ************************************************************************************************************** */
 int sys_loadSprites (sys_t * sys_t_ptr) {
 
@@ -93,7 +93,7 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Makes sprite transparent
 * ************************************************************************************************************** */
 int sys_makeTransparent (sys_t * sys_t_ptr, SDL_Surface * surf_ptr) {
 
@@ -103,7 +103,7 @@ int sys_makeTransparent (sys_t * sys_t_ptr, SDL_Surface * surf_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Draw all sprites on screen
 * ************************************************************************************************************** */
 int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
@@ -183,14 +183,80 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*   Free memory
+*   Free memory and Exit SDL
 * ************************************************************************************************************** */
-int sys_cleanUp (sys_t * sys_t_ptr) {
+int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
-    /* Free memory */
+    int i, j ;
+
+    /* game_t_ptr pointers */
+
+    /* bubs_array */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        free (game_t_ptr->bubs_array[i]) ;
+    }
+
+    free (game_t_ptr->bubs_array) ;
+
+    /* bub_array_centers */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            free (game_t_ptr->bub_array_centers[i][j]) ;
+        }
+
+        free (game_t_ptr->bub_array_centers[i]) ;
+    }
+
+    free (game_t_ptr->bub_array_centers) ;
+
+    /* bub_connected_component */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        free (game_t_ptr->bub_connected_component[i]) ;
+    }
+
+    free (game_t_ptr->bub_connected_component) ;
+
+    /* bub_fifo */
+    for (i = 0 ; i < (BUB_NY * BUB_NX) ; i += 1) {
+
+        free (game_t_ptr->bub_fifo[i]) ;
+    }
+
+    free (game_t_ptr->bub_fifo) ;
+
+    free (game_t_ptr) ;
+
+
+
+    /* bub_t pointers */
+
+    free (bub_t_ptr->position) ;
+    free (bub_t_ptr->sprite_ptr) ;
+    free (bub_t_ptr) ;
+
+
+    /* SDL pointers */
+
     SDL_FreeSurface (sys_t_ptr->launcher_srf_ptr) ;
 
-    SDL_FreeSurface (sys_t_ptr->frame_srf_ptr);
+    SDL_FreeSurface (sys_t_ptr->frame_srf_ptr) ;
+
+    SDL_FreeSurface (sys_t_ptr->screen_srf_ptr) ;
+
+
+    /* sys_t_ptr pointers */
+
+    free (sys_t_ptr->cache_rect_ptr) ;
+    free (sys_t_ptr->frame_rect_ptr) ;
+    free (sys_t_ptr->launcher_rect_ptr) ;
+    free (sys_t_ptr) ;
+
 
     /* Quit framework */
     SDL_Quit ();
@@ -200,7 +266,7 @@ int sys_cleanUp (sys_t * sys_t_ptr) {
 
 
 /* ****************************************************************************************************************
-* function that receives [i=lig][j=col] of a cell from the bubs_array
+* Function that receives [i=lig][j=col] of a cell from the bubs_array
 * returns a _ptr to SDL_Rect object with coords /x and y OF TOP LEFT CORNER/
 * so that main program can position the bub
 * WARNING : coords are for top left corner
@@ -223,7 +289,7 @@ SDL_Rect * sys_getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
 
 
 /* ****************************************************************************************************************
-*
+*   Returns a random number between 0 and max
 * ************************************************************************************************************** */
 short getRandomNumber(int max) {
 
@@ -239,7 +305,7 @@ short getRandomNumber(int max) {
 
 
 /* ****************************************************************************************************************
-*
+*   Handles the SDL events
 * ************************************************************************************************************** */
 void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
 {

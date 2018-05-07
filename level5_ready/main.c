@@ -13,7 +13,7 @@
 #include "bub.h"
 
 
-int main()
+int main ()
 {
     bool debug = false ;
 
@@ -87,7 +87,6 @@ int main()
 
                     /* we reset */
                     game_newGame (game_t_ptr, bub_t_ptr) ;
-
                 }
                 /* we place the bub */
                 else {
@@ -106,6 +105,16 @@ int main()
 
                     free (bubJustPlaced_rect) ;
 
+                    /* check if game won */
+                    if (game_checkVictory (game_t_ptr)) {
+
+                        /* victory message */
+                        printf ("VICTORY :-)\n") ;
+
+                        /* we reset */
+                        game_newGame (game_t_ptr, bub_t_ptr) ;
+                    }
+
                     /* return bub to launcher */
                     bub_init (bub_t_ptr, game_t_ptr);
                 }
@@ -117,7 +126,7 @@ int main()
     }
 
     /* free memory and quit*/
-    sys_cleanUp (sys_t_ptr) ;
+    sys_cleanUp (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
 
     return (0) ;
 }

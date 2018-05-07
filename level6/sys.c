@@ -205,20 +205,87 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
 /* ****************************************************************************************************************
-*   Free memory
+*   Free memory and Exit SDL
 * ************************************************************************************************************** */
-int sys_cleanUp (sys_t * sys_t_ptr) {
+int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
-    /* Free memory */
+    int i, j ;
+
+    /* game_t_ptr pointers */
+
+    /* bubs_array */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        free (game_t_ptr->bubs_array[i]) ;
+    }
+
+    free (game_t_ptr->bubs_array) ;
+
+    /* bub_array_centers */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            free (game_t_ptr->bub_array_centers[i][j]) ;
+        }
+
+        free (game_t_ptr->bub_array_centers[i]) ;
+    }
+
+    free (game_t_ptr->bub_array_centers) ;
+
+    /* bub_connected_component */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        free (game_t_ptr->bub_connected_component[i]) ;
+    }
+
+    free (game_t_ptr->bub_connected_component) ;
+
+    /* bub_fifo */
+    for (i = 0 ; i < (BUB_NY * BUB_NX) ; i += 1) {
+
+        free (game_t_ptr->bub_fifo[i]) ;
+    }
+
+    free (game_t_ptr->bub_fifo) ;
+
+    free (game_t_ptr) ;
+
+
+
+    /* bub_t pointers */
+
+    free (bub_t_ptr->position) ;
+    free (bub_t_ptr->sprite_ptr) ;
+    free (bub_t_ptr) ;
+
+
+    /* SDL pointers */
+
     SDL_FreeSurface (sys_t_ptr->launcher_srf_ptr) ;
 
-    SDL_FreeSurface (sys_t_ptr->frame_srf_ptr);
+    SDL_FreeSurface (sys_t_ptr->frame_srf_ptr) ;
+
+    SDL_FreeSurface (sys_t_ptr->screen_srf_ptr) ;
+
+
+    /* sys_t_ptr pointers */
+
+    free (sys_t_ptr->cache_rect_ptr) ;
+    free (sys_t_ptr->frame_rect_ptr) ;
+    free (sys_t_ptr->launcher_rect_ptr) ;
+    free (sys_t_ptr) ;
+
 
     /* Quit framework */
     SDL_Quit ();
 
     return (0) ;
 }
+
 
 
 /* ****************************************************************************************************************
@@ -306,18 +373,4 @@ void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
             }
             break;
     }
-}
-
-
-/* ****************************************************************************************************************
-*
-* ************************************************************************************************************** */
-
-void fatal (char *message) {
-    char error_message[100] ;
-
-    strcpy (error_message, "[!!] Fatal Error\n") ;
-    strncat (error_message, message, 83) ;
-    perror (error_message) ;
-    //exit (-1) ;
 }
