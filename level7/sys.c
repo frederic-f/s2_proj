@@ -165,7 +165,7 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
             if (game_t_ptr->bubs_array[i][j] > 0) {
 
                 /* update the position of the bub to display */
-                dumRect_ptr = sys_getBubPositionRect(i, j, dumRect_ptr);
+                dumRect_ptr = sys_getBubPositionRect(game_t_ptr, i, j, dumRect_ptr);
 
                 /* display */
                 SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->bubs_array[i][j] - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, dumRect_ptr);
@@ -295,7 +295,7 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 * WARNING : coords are for top left corner
 * ************************************************************************************************************** */
 
-SDL_Rect * sys_getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
+SDL_Rect * sys_getBubPositionRect(game_t * game_t_ptr, int i, int j, SDL_Rect * dumRect_ptr) {
 
     /* distance between each bub */
     int d_x = (BOARD_RIGHT - BOARD_LEFT) / 8;
@@ -305,7 +305,7 @@ SDL_Rect * sys_getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
      * for odd rows (2d option of ternary op) we add a shift to the right */
     dumRect_ptr->x = (i % 2 == 0) ? BOARD_LEFT + j*d_x : BOARD_LEFT + j*d_x + BUB_SIZE / 2;
 
-    dumRect_ptr->y = BOARD_TOP + 31 + (35 * i) ; //35 because 40 * sqrt(3)/2 = 35 and with that bubs are close to each other
+    dumRect_ptr->y = BOARD_TOP  + (35 * i)  + (35 * game_t_ptr->roofShift) ; //35 because 35 = 40 * sqrt(3)/2 and with that bubs are close to each other
 
     return dumRect_ptr ;
 }

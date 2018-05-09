@@ -48,12 +48,26 @@ int main()
     bub_init (bub_t_ptr, game_t_ptr) ;
 
 
+
+
+    int ticks = SDL_GetTicks() ;
+    printf ("%d\n", ticks) ;
+
+
+
     /* ****************************************************************************************************************
     * main loop: check events and re-draw the window until the end
     * ************************************************************************************************************** */
 
+
     while (!game_t_ptr->quit)
     {
+
+
+        if ((SDL_GetTicks() - ticks) > 3000) {
+            ticks = SDL_GetTicks() ;
+            game_shiftRoof (game_t_ptr) ;
+        }
 
         /* Look for an event */
         SDL_Event event;

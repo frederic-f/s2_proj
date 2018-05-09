@@ -184,8 +184,8 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
     }
 
     /* 2. hit TOP */
-    if (*target_pos_y <= (double)BOARD_TOP + 31) { // it went across board in Y
-        *target_pos_y = (double)BOARD_TOP + 31 ;
+    if (*target_pos_y <= (double)BOARD_TOP + (35 * game_t_ptr->roofShift)) { // it went across board in Y
+        *target_pos_y = (double)BOARD_TOP + (35 * game_t_ptr->roofShift) ;
 
         bub_t_ptr->isMoving = false ;
 

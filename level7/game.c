@@ -22,6 +22,10 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
     int i ; /* for malloc loops */
 
+    /* At beginning of game, roof is at top */
+    /* WARNING : must be before call to game_setBubsArrayCenters */
+    game_t_ptr->roofShift = 0 ;
+
     game_t_ptr->bub_ny = BUB_NY ;
 
     if (debug) {
@@ -104,9 +108,12 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 }
 
 /* ****************************************************************************************************************
-*   Reinitializes game
+*   Reinitializes game TODO launch this from game_init for first game
 * ************************************************************************************************************** */
 int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+    /* roof back to top */
+    game_t_ptr->roofShift = 0 ;
 
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
@@ -200,7 +207,7 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
             int col = j + getRandomNumber(NUM_COLOR) ;
             col = (col > 8) ? 8 : col ;
-            //col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
+            col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
 
             /* set whole lines of bubs here if you want to test */
             game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
@@ -263,7 +270,7 @@ int game_setBubsArrayCenters (game_t * game_t_ptr) {
             game_t_ptr->bub_array_centers[i][j] = (int *) malloc (2 * sizeof(int)) ;
 
             /* we use the function to get coords of TOP LEFT corner */
-            rectForCenters_ptr = sys_getBubPositionRect(i, j, rectForCenters_ptr) ;
+            rectForCenters_ptr = sys_getBubPositionRect(game_t_ptr, i, j, rectForCenters_ptr) ;
 
             /* and add BUB_SIZE/2 to get coords of centers */
             game_t_ptr->bub_array_centers[i][j][0] = rectForCenters_ptr->x + BUB_SIZE/2 ;
@@ -536,7 +543,7 @@ int game_addFallingBub (game_t * game_t_ptr, int color, int line, int col, bool 
     /* set the coordinates of bub */
     SDL_Rect * rect_ptr = (SDL_Rect *) malloc (sizeof(SDL_Rect)) ;
 
-    rect_ptr = sys_getBubPositionRect (line, col, rect_ptr) ;
+    rect_ptr = sys_getBubPositionRect (game_t_ptr, line, col, rect_ptr) ;
 
     bub_ptr->position = rect_ptr ;
 
@@ -949,4 +956,16 @@ bool game_checkVictory (game_t * game_t_ptr) {
     }
 
     return true ;
+}
+
+/* ****************************************************************************************************************
+*   Shifts the roof down
+* ************************************************************************************************************** */
+int game_shiftRoof (game_t * game_t_ptr) {
+
+    game_t_ptr->roofShift += 1 ;
+
+    game_setBubsArrayCenters (game_t_ptr) ;
+
+    return 0 ;
 }

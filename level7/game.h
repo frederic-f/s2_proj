@@ -41,6 +41,8 @@ bool game_checkVictory (game_t * game_t_ptr) ;
 
 int game_moveFallingBub (game_t * game_t_ptr) ;
 
+int game_shiftRoof (game_t * game_t_ptr) ;
+
 
 
 

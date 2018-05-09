@@ -27,6 +27,7 @@
 #define BUB_NY              11      /* vrtcl */
 
 #define NUM_COLOR	        8
+#define ROOFSHIFT           3
 
 
 #include <SDL.h>
@@ -109,6 +110,8 @@ struct Game_t {
     struct Bub_t * * bub_fallingBubs ; /* to keep track of bub falling */
 
     int bub_numFallingBubs ;
+
+    int roofShift ; /* Default: 0. How many times the roof got down */
 
 };
 typedef struct Game_t game_t ;
