@@ -71,7 +71,11 @@ int main()
             /* timer reset */
             game_resetRoofTimer (game_t_ptr) ;
 
+            /* check if roof shift makes bub be below limit */
+            game_checkRoofGameOver (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
         }
+
 
         /* Look for an event */
         SDL_Event event;
@@ -100,8 +104,8 @@ int main()
                 /* if it is game over... */
                 if (bub_isBelowLimit (bub_t_ptr)) {
 
-                    /* game over message */
-                    printf ("GAME OVER :-(\n") ;
+                    /* game over routine (message, etc.) */
+                    game_gameOver ();
 
                     /* we reset */
                     game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
@@ -147,6 +151,10 @@ int main()
 
         /* draw all the sprites and update the screen */
         sys_draw (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
+        /* here we check for game over (roof down, ...), that is, AFTER screen is updated (so player can see what happened */
+
+
     }
 
     /* free memory and quit*/

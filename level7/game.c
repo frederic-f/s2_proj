@@ -1002,3 +1002,42 @@ int game_resetRoofTimer (game_t * game_t_ptr) {
 
     return 0 ;
 }
+
+
+/* ****************************************************************************************************************
+*   Game over routine
+* ************************************************************************************************************** */
+int game_gameOver () {
+
+    /* game over message */
+    printf ("GAME OVER :-(\n") ;
+
+    return 0 ;
+}
+
+/* ****************************************************************************************************************
+*   Checks if roof pushed bubs below limit
+* ************************************************************************************************************** */
+int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+    /* the roof just got down.
+     * we check if the row that is now below the limit contains any bub */
+
+    /* the index of the row that is now below limit */
+    int lastLineIndex = BUB_NY - game_t_ptr->roofShift ;
+
+    /* see if there are bubs on that row */
+    /* if the row is even, there are 8 spots to check, 7 spots for odd row */
+    int numBubs = (lastLineIndex % 2 == 0) ? 8 : 7 ;
+
+    int i ;
+
+    for (i = 0 ; i < numBubs ; i += 1) {
+        if (game_t_ptr->bubs_array[lastLineIndex][i] > 0) {
+            game_gameOver () ;
+
+            game_newGame(sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+        }
+    }
+    return 0 ;
+}

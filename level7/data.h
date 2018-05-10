@@ -13,7 +13,7 @@
 #define BOARD_TOP           31
 
 #define ROOF_HEIGHT         9
-#define ROOF_DELAY          1000 /* ms */
+#define ROOF_DELAY          10000 /* ms */
 
 #define LAUNCHER_DIV        48 /*PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations*/
 #define PI                  3.14159265359
