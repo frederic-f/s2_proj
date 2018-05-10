@@ -13,7 +13,7 @@
 
 int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) ;
 
-int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) ;
+int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 int game_loadSprites (game_t * game_t_ptr, sys_t * sys_t_ptr) ;
 
@@ -41,8 +41,11 @@ bool game_checkVictory (game_t * game_t_ptr) ;
 
 int game_moveFallingBub (game_t * game_t_ptr) ;
 
-int game_shiftRoof (game_t * game_t_ptr) ;
+int game_resetRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
 
+int game_shiftRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
+
+int game_resetRoofTimer (game_t * game_t_ptr) ;
 
 
 

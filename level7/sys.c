@@ -51,6 +51,11 @@ int sys_init (sys_t * sys_t_ptr) {
     sys_t_ptr->frame_rect_ptr->y = 0 ;
 
 
+    /* roof - top frame*/
+    sys_t_ptr->frameTop_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->frameTop_rect_ptr->x = BOARD_LEFT ;
+
     /* creation of a CACHE to hide the launcher sprite */
     sys_t_ptr->cache_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
@@ -73,7 +78,7 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
 
     /* Frame of board */
-    temp  = SDL_LoadBMP("frame_1p.bmp");
+    temp  = SDL_LoadBMP("img/frame_1p.bmp");
     sys_t_ptr->frame_srf_ptr = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
 
@@ -81,11 +86,19 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
 
     /* Launcher */
-    temp = SDL_LoadBMP("frame_launcher.bmp");
+    temp = SDL_LoadBMP("img/frame_launcher.bmp");
     sys_t_ptr->launcher_srf_ptr = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
 
     sys_makeTransparent (sys_t_ptr, sys_t_ptr->launcher_srf_ptr) ;
+
+
+    /* Roof */
+    temp = SDL_LoadBMP("img/frame_top.bmp");
+    sys_t_ptr->frameTop_srf_ptr = SDL_DisplayFormat(temp) ;
+    SDL_FreeSurface(temp) ;
+
+    //sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameTop_srf_ptr) ;
 
 
     return (0) ;
@@ -130,6 +143,14 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     launcherImg_rect.y = LAUNCHER_HEIGHT * game_t_ptr->launcherOrientation ;
 
     SDL_BlitSurface(sys_t_ptr->launcher_srf_ptr, &launcherImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->launcher_rect_ptr) ;
+
+
+    /* roof */
+    /* show roof only when it has moved down */
+    if (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) {
+        SDL_BlitSurface(sys_t_ptr->frameTop_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameTop_rect_ptr) ;
+    }
+
 
 
     /* draw bubs */
@@ -268,6 +289,7 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
     SDL_FreeSurface (sys_t_ptr->launcher_srf_ptr) ;
 
     SDL_FreeSurface (sys_t_ptr->frame_srf_ptr) ;
+    SDL_FreeSurface (sys_t_ptr->frameTop_srf_ptr) ;
 
     SDL_FreeSurface (sys_t_ptr->screen_srf_ptr) ;
 
@@ -276,6 +298,7 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
     free (sys_t_ptr->cache_rect_ptr) ;
     free (sys_t_ptr->frame_rect_ptr) ;
+    free (sys_t_ptr->frameTop_rect_ptr) ;
     free (sys_t_ptr->launcher_rect_ptr) ;
     free (sys_t_ptr) ;
 
@@ -312,15 +335,17 @@ SDL_Rect * sys_getBubPositionRect(game_t * game_t_ptr, int i, int j, SDL_Rect * 
 
 
 /* ****************************************************************************************************************
-*   Returns a random number between 0 and max
+*   Returns a random number between 0 and (max - 1)
 * ************************************************************************************************************** */
 short getRandomNumber(int max) {
 
+    clock_t start_t ;
 
-    time_t t ;
+    /* Get number of CPU ticks since program started */
+    start_t = clock();
 
     /* Initializes random number generator */
-    srand ((unsigned) time (&t)) ;
+    srand (start_t) ;
 
     /* Generates numbers from 0 to max */
     return rand() % max ;

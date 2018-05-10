@@ -48,11 +48,10 @@ int main()
     bub_init (bub_t_ptr, game_t_ptr) ;
 
 
-
-
-    int ticks = SDL_GetTicks() ;
-    printf ("%d\n", ticks) ;
-
+    /* ****************************************************************************************************************
+    * Starts a new game
+    * ************************************************************************************************************** */
+    game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
 
 
     /* ****************************************************************************************************************
@@ -63,10 +62,15 @@ int main()
     while (!game_t_ptr->quit)
     {
 
+        /* we check if roof has to go down*/
+        if ((SDL_GetTicks() - game_t_ptr->roofTimer) > ROOF_DELAY) {
 
-        if ((SDL_GetTicks() - ticks) > 3000) {
-            ticks = SDL_GetTicks() ;
-            game_shiftRoof (game_t_ptr) ;
+            /* roof goes down one notch */
+            game_shiftRoof (sys_t_ptr, game_t_ptr) ;
+
+            /* timer reset */
+            game_resetRoofTimer (game_t_ptr) ;
+
         }
 
         /* Look for an event */
@@ -100,7 +104,7 @@ int main()
                     printf ("GAME OVER :-(\n") ;
 
                     /* we reset */
-                    game_newGame (game_t_ptr, bub_t_ptr) ;
+                    game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
 
                 }
                 /* we place the bub */
@@ -127,7 +131,7 @@ int main()
                         printf ("VICTORY :-)\n") ;
 
                         /* we reset */
-                        game_newGame (game_t_ptr, bub_t_ptr) ;
+                        game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
                     }
 
                     /* return bub to launcher */

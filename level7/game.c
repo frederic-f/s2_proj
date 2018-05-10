@@ -24,9 +24,9 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
     /* At beginning of game, roof is at top */
     /* WARNING : must be before call to game_setBubsArrayCenters */
-    game_t_ptr->roofShift = 0 ;
+    //game_t_ptr->roofShift = 0 ;
 
-    game_t_ptr->bub_ny = BUB_NY ;
+    game_resetRoof(sys_t_ptr, game_t_ptr) ;
 
     if (debug) {
         printf ("**game initialized\n\n") ;
@@ -58,7 +58,7 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 
 
     /* bub_array_center*/
-    game_setBubsArrayCenters (game_t_ptr) ;
+    //game_setBubsArrayCenters (game_t_ptr) ;
 
 
     /* bub_connected_component */
@@ -110,10 +110,10 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 /* ****************************************************************************************************************
 *   Reinitializes game TODO launch this from game_init for first game
 * ************************************************************************************************************** */
-int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) {
+int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
     /* roof back to top */
-    game_t_ptr->roofShift = 0 ;
+    game_resetRoof(sys_t_ptr, game_t_ptr) ;
 
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
@@ -121,6 +121,8 @@ int game_newGame (game_t * game_t_ptr, bub_t * bub_t_ptr) {
     game_resetBubsArray (game_t_ptr) ;
 
     bub_init (bub_t_ptr, game_t_ptr) ;
+
+    game_resetRoofTimer (game_t_ptr) ;
 
     return (0) ;
 }
@@ -205,9 +207,9 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
         for (j = 0 ; j < j_max ; j +=1 ) {
 
-            int col = j + getRandomNumber(NUM_COLOR) ;
-            col = (col > 8) ? 8 : col ;
-            col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
+            int col = getRandomNumber(NUM_COLOR) + 1  ;
+            //col = (col > 8) ? 8 : col ;
+            //col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
 
             /* set whole lines of bubs here if you want to test */
             game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
@@ -811,7 +813,7 @@ bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rec
     /* Y coordinate : if y < 0 (beyond roof)
      * or y == bub_ny (beyond bottom line)
      * -> NULL */
-    if ((rect_ptr->y < 0) || (rect_ptr->y == game_t_ptr->bub_ny)) {
+    if ((rect_ptr->y < 0) ) {
         return NULL ;
     }
 
@@ -959,13 +961,44 @@ bool game_checkVictory (game_t * game_t_ptr) {
 }
 
 /* ****************************************************************************************************************
+*   Return roof to start position
+* ************************************************************************************************************** */
+int game_resetRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) {
+
+    game_t_ptr->roofShift = 0 ;
+
+    sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT ;
+
+    game_setBubsArrayCenters (game_t_ptr) ;
+
+    return 0 ;
+}
+
+/* ****************************************************************************************************************
 *   Shifts the roof down
 * ************************************************************************************************************** */
-int game_shiftRoof (game_t * game_t_ptr) {
+int game_shiftRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) {
 
     game_t_ptr->roofShift += 1 ;
 
+    sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT + 35 * game_t_ptr->roofShift ; /* 35 = 40 * sqrt(3) / 2 */
+
+    //printf ("Before : coord of (0, 0)") ;
+
     game_setBubsArrayCenters (game_t_ptr) ;
+
+    //printf ("After : coord of (0, 0)") ;
+
+    return 0 ;
+}
+
+
+/* ****************************************************************************************************************
+*   Resets time for roof
+* ************************************************************************************************************** */
+int game_resetRoofTimer (game_t * game_t_ptr) {
+
+    game_t_ptr->roofTimer = SDL_GetTicks() ;
 
     return 0 ;
 }

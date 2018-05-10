@@ -289,17 +289,19 @@ SDL_Rect * sys_getBubPositionRect(int i, int j, SDL_Rect * dumRect_ptr) {
 
 
 /* ****************************************************************************************************************
-*   Returns a random number between 0 and max
+*   Returns a random number between 0 and (max - 1)
 * ************************************************************************************************************** */
 short getRandomNumber(int max) {
 
+    clock_t start_t ;
 
-    time_t t ;
+    /* Get number of CPU ticks since program started */
+    start_t = clock();
 
     /* Initializes random number generator */
-    srand ((unsigned) time (&t)) ;
+    srand (start_t) ;
 
-    /* Generates numbers from 0 to NUM_COLOR */
+    /* Generates numbers from 0 to max */
     return rand() % max ;
 }
 

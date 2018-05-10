@@ -165,15 +165,11 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
         for (j = 0 ; j < j_max ; j +=1 ) {
 
-            int col = j + getRandomNumber(NUM_COLOR) ;
-            col = (col > 8) ? 8 : col ;
-            //col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
+            /* get random number 1-8 */
+            int col = getRandomNumber(NUM_COLOR) + 1 ;
 
             /* set whole lines of bubs here if you want to test */
             game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
-
-            /* set all bubs to value */
-            //game_t_ptr->bubs_array[i][j] = 7 ;
         }
     }
 
@@ -463,131 +459,130 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect, boo
     }
 
     /* if bub we just placed can be added ... */
-    if (!game_addBubConnected (game_t_ptr, bubJustPlaced_rect)) {
+    game_addBubConnected (game_t_ptr, bubJustPlaced_rect) ;
 
-        /* ... then we check the new network of connexity */
+    /* ... then we check the new network of connexity */
 
-        /* memory allocation for temp variables */
+    /* memory allocation for temp variables */
 
-        /* this temp will hold the current coordinates of spot whose connexity is checked */
-        SDL_Rect * bubCoord_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+    /* this temp will hold the current coordinates of spot whose connexity is checked */
+    SDL_Rect * bubCoord_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
-	    /* this temp will hold the neighboring bubs */
-	    bub_t * bub_t_neighbour_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
-	    /* we keep the address in memory to re-assign it after NULL is assigned to it by function game_getBubAt */
-        bub_t * bub_t_neighbour_ptr_2 = bub_t_neighbour_ptr ;
+    /* this temp will hold the neighboring bubs */
+    bub_t * bub_t_neighbour_ptr = (bub_t *) malloc (sizeof (bub_t)) ;
+    /* we keep the address in memory to re-assign it after NULL is assigned to it by function game_getBubAt */
+    bub_t * bub_t_neighbour_ptr_2 = bub_t_neighbour_ptr ;
 
-        /* get the color for connexity */
-        bub_t_neighbour_ptr = game_getBubAt(game_t_ptr, bub_t_neighbour_ptr, bubJustPlaced_rect) ;
-        short colorForConnexity = bub_t_neighbour_ptr->color ;
+    /* get the color for connexity */
+    bub_t_neighbour_ptr = game_getBubAt(game_t_ptr, bub_t_neighbour_ptr, bubJustPlaced_rect) ;
+    short colorForConnexity = bub_t_neighbour_ptr->color ;
 
-        /* loop to explore connexity */
+    /* loop to explore connexity */
 
-        /* while the queue is not empty...*/
-        while (game_t_ptr->fifoHead != game_t_ptr->fifoTail) {
+    /* while the queue is not empty...*/
+    while (game_t_ptr->fifoHead != game_t_ptr->fifoTail) {
 
-            /* get coordinates of next bub in queue */
-            bubCoord_rect->y = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][0] ;
-            bubCoord_rect->x = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][1] ;
+        /* get coordinates of next bub in queue */
+        bubCoord_rect->y = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][0] ;
+        bubCoord_rect->x = game_t_ptr->bub_fifo[game_t_ptr->fifoTail][1] ;
 
-            /* dequeue right away */
-            game_t_ptr->fifoTail += 1 ;
+        /* dequeue right away */
+        game_t_ptr->fifoTail += 1 ;
 
-            /* get all the neighbours */
+        /* get all the neighbours */
 
-            if ((bubCoord_rect->y % 2) == 0) { // bub is on even row
+        if ((bubCoord_rect->y % 2) == 0) { // bub is on even row
 
-                if (debug)
-                    printf("  Current bub on even row\n");
+            if (debug)
+                printf("  Current bub on even row\n");
 
-                /* 1st neighbour, 1 o'clock*/
-                bubCoord_rect->y -= 1 ;
+            /* 1st neighbour, 1 o'clock*/
+            bubCoord_rect->y -= 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-
-                /* 2nd neighbour, 3 o'clock*/
-                bubCoord_rect->x += 1 ;
-                bubCoord_rect->y += 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
 
 
-                /* 3rd neighbour, 5 o'clock*/
-                bubCoord_rect->x -= 1 ;
-                bubCoord_rect->y += 1 ;
+            /* 2nd neighbour, 3 o'clock*/
+            bubCoord_rect->x += 1 ;
+            bubCoord_rect->y += 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-
-                /* 4th neighbour, 7 o'clock*/
-                bubCoord_rect->x -= 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
 
 
-                /* 5th neighbour, 9 o'clock*/
-                bubCoord_rect->y -= 1 ;
+            /* 3rd neighbour, 5 o'clock*/
+            bubCoord_rect->x -= 1 ;
+            bubCoord_rect->y += 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-
-                /* 6th neighbour, 11 o'clock*/
-                bubCoord_rect->y -= 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-            }
-
-            else {
-
-                if (debug) {
-                    printf ("  Current bub on odd row\n") ;
-                }
-
-                /* 1st neighbour, 1 o'clock*/
-                bubCoord_rect->x += 1 ;
-                bubCoord_rect->y -= 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
 
 
-                /* 2nd neighbour, 3 o'clock*/
-                bubCoord_rect->y += 1 ;
+            /* 4th neighbour, 7 o'clock*/
+            bubCoord_rect->x -= 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-
-                /* 3rd neighbour, 5 o'clock*/
-                bubCoord_rect->y += 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
 
 
-                /* 4th neighbour, 7 o'clock*/
-                bubCoord_rect->x -= 1 ;
+            /* 5th neighbour, 9 o'clock*/
+            bubCoord_rect->y -= 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-
-
-                /* 5th neighbour, 9 o'clock*/
-                bubCoord_rect->x -= 1 ;
-                bubCoord_rect->y -= 1 ;
-
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
 
 
-                /* 6th neighbour, 11 o'clock*/
-                bubCoord_rect->x += 1 ;
-                bubCoord_rect->y -= 1 ;
+            /* 6th neighbour, 11 o'clock*/
+            bubCoord_rect->y -= 1 ;
 
-                game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
-	        }
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
         }
 
-        free (bub_t_neighbour_ptr) ;
-        free (bubCoord_rect) ;
+        else {
+
+            if (debug) {
+                printf ("  Current bub on odd row\n") ;
+            }
+
+            /* 1st neighbour, 1 o'clock*/
+            bubCoord_rect->x += 1 ;
+            bubCoord_rect->y -= 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
+
+            /* 2nd neighbour, 3 o'clock*/
+            bubCoord_rect->y += 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
+
+            /* 3rd neighbour, 5 o'clock*/
+            bubCoord_rect->y += 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
+
+            /* 4th neighbour, 7 o'clock*/
+            bubCoord_rect->x -= 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
+
+            /* 5th neighbour, 9 o'clock*/
+            bubCoord_rect->x -= 1 ;
+            bubCoord_rect->y -= 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+
+
+            /* 6th neighbour, 11 o'clock*/
+            bubCoord_rect->x += 1 ;
+            bubCoord_rect->y -= 1 ;
+
+            game_spotCheckConnexity(game_t_ptr, bub_t_neighbour_ptr, bub_t_neighbour_ptr_2, bubCoord_rect, colorConnexity, colorForConnexity) ;
+        }
     }
+
+    free (bub_t_neighbour_ptr) ;
+    free (bubCoord_rect) ;
 
     return (0) ;
 }

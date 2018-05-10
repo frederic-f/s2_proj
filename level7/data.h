@@ -12,6 +12,9 @@
 #define BOARD_RIGHT         520
 #define BOARD_TOP           31
 
+#define ROOF_HEIGHT         9
+#define ROOF_DELAY          1000 /* ms */
+
 #define LAUNCHER_DIV        48 /*PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations*/
 #define PI                  3.14159265359
 
@@ -70,13 +73,17 @@ struct Sys_t {
 
     SDL_Surface * launcher_srf_ptr ;
 
-    SDL_Surface * frame_srf_ptr ;
+    SDL_Rect * launcher_rect_ptr ; /* to place the launcher */
 
-    SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
+    SDL_Surface * frame_srf_ptr ;
 
     SDL_Rect * frame_rect_ptr ; /* to place the board frame */
 
-    SDL_Rect * launcher_rect_ptr ; /* to place the launcher */
+    SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
+
+    SDL_Surface * frameTop_srf_ptr ;
+
+    SDL_Rect * frameTop_rect_ptr ; /* to place the roof */
 
     int colorkey ; /* transparency color */
 
@@ -103,8 +110,6 @@ struct Game_t {
 
     int fifoHead, fifoTail ; /* indexes for bub_fifo */
 
-    int bub_ny ; /* used when roof goes down */
-
     int quit ;
 
     struct Bub_t * * bub_fallingBubs ; /* to keep track of bub falling */
@@ -112,6 +117,8 @@ struct Game_t {
     int bub_numFallingBubs ;
 
     int roofShift ; /* Default: 0. How many times the roof got down */
+
+    int roofTimer ; /* SDL_GetTicks timer to keep track of time for roof movement */
 
 };
 typedef struct Game_t game_t ;
