@@ -35,8 +35,7 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
     /* Load all Sprites */
     game_loadSprites (game_t_ptr, sys_t_ptr) ;
 
-    /* launcher is vertical by default */
-    game_t_ptr->launcherOrientation = 22 ;
+
 
     /* gameover */
     game_t_ptr -> quit = 0 ;
@@ -123,6 +122,12 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     bub_init (bub_t_ptr, game_t_ptr) ;
 
     game_resetRoofTimer (game_t_ptr) ;
+
+    /* launcher is vertical by default */
+    game_t_ptr->launcherOrientation = 22 ;
+
+    /*  */
+    game_t_ptr->gearsOrientation = 20 ;
 
     return (0) ;
 }

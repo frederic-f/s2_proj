@@ -8,6 +8,9 @@
 #define LAUNCHER_HEIGHT     157
 #define LAUNCHER_CENTER     94
 
+#define GEARS_WIDTH         126
+#define GEARS_HEIGHT        116
+
 #define BOARD_LEFT          200
 #define BOARD_RIGHT         520
 #define BOARD_TOP           31
@@ -24,7 +27,7 @@
 
 #define BUB_SIZE            40 /*horizontal and vertical size*/
 #define BUB_EX_SIZE         54 /* size of exploding bub */
-#define BUB_START_Y         457
+#define BUB_START_Y         438
 
 #define BUB_NX              8       /* max number of bubs in hrztl direction */
 #define BUB_NY              11      /* vrtcl */
@@ -85,6 +88,10 @@ struct Sys_t {
 
     SDL_Rect * frameTop_rect_ptr ; /* to place the roof */
 
+    SDL_Surface * frameGears_srf_ptr ;
+
+    SDL_Rect * frameGears_rect_ptr ;
+
     int colorkey ; /* transparency color */
 
 };
@@ -95,6 +102,8 @@ typedef struct Sys_t sys_t ;/* step of x motion */
 struct Game_t {
 
     int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
+
+    int gearsOrientation ; /* value : 0-45 /  22 (vertical) is start value */
 
     SDL_Surface * bubs[NUM_COLOR] ;
 

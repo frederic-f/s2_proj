@@ -36,12 +36,25 @@ int sys_init (sys_t * sys_t_ptr) {
     sys_loadSprites (sys_t_ptr) ;
 
 
-    /* launcher */
+    /* launcher items */
+
+    /* main piece */
     sys_t_ptr->launcher_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
     /* set sprite LAUNCHER position in the bottoom of the window */
     sys_t_ptr->launcher_rect_ptr->x = (SCREEN_WIDTH - LAUNCHER_WIDTH) / 2; // in the middle of the window in WIDTH
-    sys_t_ptr->launcher_rect_ptr->y = SCREEN_HEIGHT - LAUNCHER_HEIGHT ; // at the bottom in HEIGHT
+    sys_t_ptr->launcher_rect_ptr->y = SCREEN_HEIGHT - LAUNCHER_HEIGHT - 19 ; // at the bottom in HEIGHT
+
+
+    /* gears piece */
+    sys_t_ptr->frameGears_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    /* set sprite LAUNCHER position in the bottoom of the window */
+    sys_t_ptr->frameGears_rect_ptr->x = (SCREEN_WIDTH - GEARS_WIDTH) / 2 + 9; // in the middle of the window in WIDTH
+    sys_t_ptr->frameGears_rect_ptr->y = SCREEN_HEIGHT - GEARS_HEIGHT - 19 ; // at the bottom in HEIGHT
+
+
+
 
 
     /* board frame*/
@@ -92,13 +105,22 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
     sys_makeTransparent (sys_t_ptr, sys_t_ptr->launcher_srf_ptr) ;
 
+    /* Roof */
+    temp = SDL_LoadBMP("img/frame_gears.bmp");
+    sys_t_ptr->frameGears_srf_ptr = SDL_DisplayFormat(temp) ;
+    SDL_FreeSurface(temp) ;
+
+    sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameGears_srf_ptr) ;
+
 
     /* Roof */
     temp = SDL_LoadBMP("img/frame_top.bmp");
     sys_t_ptr->frameTop_srf_ptr = SDL_DisplayFormat(temp) ;
     SDL_FreeSurface(temp) ;
 
-    //sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameTop_srf_ptr) ;
+    sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameTop_srf_ptr) ;
+
+
 
 
     return (0) ;
@@ -134,6 +156,17 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     SDL_BlitSurface(sys_t_ptr->frame_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frame_rect_ptr) ;
 
 
+
+    /* gears */
+    SDL_Rect gearsImg_rect ;
+
+    gearsImg_rect.w = GEARS_WIDTH ;
+    gearsImg_rect.h = GEARS_HEIGHT ;
+    gearsImg_rect.x = 0 ; // the image is moved in height, not in width
+    gearsImg_rect.y = GEARS_HEIGHT * game_t_ptr->launcherOrientation ;
+
+    SDL_BlitSurface(sys_t_ptr->frameGears_srf_ptr, &gearsImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameGears_rect_ptr) ;
+
     /* launcher */
     SDL_Rect launcherImg_rect ;
 
@@ -143,6 +176,9 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     launcherImg_rect.y = LAUNCHER_HEIGHT * game_t_ptr->launcherOrientation ;
 
     SDL_BlitSurface(sys_t_ptr->launcher_srf_ptr, &launcherImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->launcher_rect_ptr) ;
+
+
+
 
 
     /* roof */

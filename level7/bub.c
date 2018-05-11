@@ -50,8 +50,8 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     bub_t_ptr->isMoving = false ;
 
     /* reset starting coordinates for bub */
-    bub_t_ptr->start_x = 720 / 2 - BUB_SIZE / 2 - 1;
-    bub_t_ptr->start_y = BUB_START_Y;
+    bub_t_ptr->start_x = SCREEN_WIDTH / 2 - BUB_SIZE / 2 - 1;
+    bub_t_ptr->start_y = BUB_START_Y ;
 
     bub_getOnLauncher(bub_t_ptr, game_t_ptr) ;
 
