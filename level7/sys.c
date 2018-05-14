@@ -38,7 +38,7 @@ int sys_init (sys_t * sys_t_ptr) {
 
     /* launcher items */
 
-    /* main piece */
+    /* arrow */
     sys_t_ptr->launcher_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
     /* set sprite LAUNCHER position in the bottoom of the window */
@@ -54,6 +54,14 @@ int sys_init (sys_t * sys_t_ptr) {
     sys_t_ptr->frameGears_rect_ptr->y = SCREEN_HEIGHT - GEARS_HEIGHT - 19 ; // at the bottom in HEIGHT
 
 
+    /* next bub */
+
+    /* next bub place */
+    sys_t_ptr->nextBub_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    /* */
+    sys_t_ptr->nextBub_rect_ptr->x = (SCREEN_WIDTH - GEARS_WIDTH) / 2 - 30;
+    sys_t_ptr->nextBub_rect_ptr->y = SCREEN_HEIGHT - 60 ;
 
 
 
@@ -163,7 +171,7 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     gearsImg_rect.w = GEARS_WIDTH ;
     gearsImg_rect.h = GEARS_HEIGHT ;
     gearsImg_rect.x = 0 ; // the image is moved in height, not in width
-    gearsImg_rect.y = GEARS_HEIGHT * game_t_ptr->launcherOrientation ;
+    gearsImg_rect.y = GEARS_HEIGHT * round(game_t_ptr->launcherOrientation / 45. * 20) ; /* there are only 40 positions for gears... */
 
     SDL_BlitSurface(sys_t_ptr->frameGears_srf_ptr, &gearsImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameGears_rect_ptr) ;
 
@@ -178,9 +186,6 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     SDL_BlitSurface(sys_t_ptr->launcher_srf_ptr, &launcherImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->launcher_rect_ptr) ;
 
 
-
-
-
     /* roof */
     /* show roof only when it has moved down */
     if (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) {
@@ -189,15 +194,20 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
 
-    /* draw bubs */
+    /* BUBS*/
+
     SDL_Rect bub_rect ;
     bub_rect.w = BUB_SIZE ;
     bub_rect.h = BUB_SIZE ;
     bub_rect.x = 0 ;
     bub_rect.y = 0 ;
 
-    /* draw moving bub */
+    /* moving bub */
     SDL_BlitSurface (bub_t_ptr->sprite_ptr, bub_t_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
+
+
+    /* next bub */
+    SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->nextBubColor - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->nextBub_rect_ptr);
 
 
     /* draw non-moving bubs */

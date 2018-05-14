@@ -45,7 +45,7 @@ int main()
 
     struct Bub_t * bub_t_ptr = (struct Bub_t *) malloc (sizeof (struct Bub_t)) ;
 
-    bub_init (bub_t_ptr, game_t_ptr) ;
+    //bub_init (bub_t_ptr, game_t_ptr) ;
 
 
     /* ****************************************************************************************************************

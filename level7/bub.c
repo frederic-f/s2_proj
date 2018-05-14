@@ -29,7 +29,9 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
      * that number will be stored in bubs_array
      * in bubs_array : 0 is for no bub
      * so we add 1 here */
-    bub_t_ptr->color = getRandomNumber (NUM_COLOR) + 1 ;
+    bub_t_ptr->color = game_t_ptr->nextBubColor ;
+
+    game_t_ptr->nextBubColor = getRandomNumber (NUM_COLOR) + 1 ;
 
     bub_setSpriteNormal (game_t_ptr, bub_t_ptr) ;
 

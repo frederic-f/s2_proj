@@ -29,6 +29,8 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
      * so we add 1 here */
     bub_t_ptr->color = getRandomNumber (NUM_COLOR) + 1 ;
 
+
+
     /* load new sprite with random color */
     bub_t_ptr->sprite_ptr = game_t_ptr->bubs[bub_t_ptr->color - 1] ;
 

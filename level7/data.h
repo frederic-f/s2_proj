@@ -16,7 +16,7 @@
 #define BOARD_TOP           31
 
 #define ROOF_HEIGHT         9
-#define ROOF_DELAY          10000 /* ms */
+#define ROOF_DELAY          20000 /* ms */
 
 #define LAUNCHER_DIV        48 /*PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations*/
 #define PI                  3.14159265359
@@ -92,6 +92,8 @@ struct Sys_t {
 
     SDL_Rect * frameGears_rect_ptr ;
 
+    SDL_Rect * nextBub_rect_ptr ;
+
     int colorkey ; /* transparency color */
 
 };
@@ -128,6 +130,8 @@ struct Game_t {
     int roofShift ; /* Default: 0. How many times the roof got down */
 
     int roofTimer ; /* SDL_GetTicks timer to keep track of time for roof movement */
+
+    int nextBubColor ;
 
 };
 typedef struct Game_t game_t ;
