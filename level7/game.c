@@ -895,7 +895,7 @@ int game_moveFallingBub (game_t * game_t_ptr) {
         } else { /* non-exploding bub */
 
             /* bub falling straight down */
-            bub_ptr->position->y += VELOCITY;
+            bub_ptr->position->y += VELOC	ITY;
         }
 
 

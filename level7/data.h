@@ -11,6 +11,9 @@
 #define GEARS_WIDTH         126
 #define GEARS_HEIGHT        116
 
+#define WHEEL_WIDTH         33
+#define WHEEL_HEIGHT        47 /* 752 pixel for 16 frames */
+
 #define BOARD_LEFT          200
 #define BOARD_RIGHT         520
 #define BOARD_TOP           31
@@ -92,7 +95,15 @@ struct Sys_t {
 
     SDL_Rect * frameGears_rect_ptr ;
 
+	SDL_Surface * frameWheel_srf_ptr ;
+
+    SDL_Rect * frameWheel_rect_ptr ;
+	
     SDL_Rect * nextBub_rect_ptr ;
+	
+	SDL_Surface * tux_srf_ptr ;
+	
+	SDL_Rect * tux_rect_ptr ;
 
     int colorkey ; /* transparency color */
 
