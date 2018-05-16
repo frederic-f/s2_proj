@@ -93,8 +93,18 @@ int sys_init (sys_t * sys_t_ptr) {
 
     /* roof - top frame*/
     sys_t_ptr->frameTop_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
-
     sys_t_ptr->frameTop_rect_ptr->x = BOARD_LEFT ;
+
+    /* chain */
+    sys_t_ptr->frameChain1_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+    sys_t_ptr->frameChain2_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->frameChain1_rect_ptr->x = BOARD_LEFT + (BOARD_RIGHT - BOARD_LEFT) * 1 / 4 - (CHAIN_WIDTH / 2) ;
+    sys_t_ptr->frameChain1_rect_ptr->y = BOARD_TOP ;
+    sys_t_ptr->frameChain2_rect_ptr->x = BOARD_LEFT + (BOARD_RIGHT - BOARD_LEFT) * 3 / 4 - (CHAIN_WIDTH / 2) ;
+    sys_t_ptr->frameChain2_rect_ptr->y = BOARD_TOP ;
+
+
 
     /* creation of a CACHE to hide the launcher sprite */
     sys_t_ptr->cache_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
@@ -160,7 +170,12 @@ int sys_loadSprites (sys_t * sys_t_ptr) {
 
     sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameTop_srf_ptr) ;
 
+    /* Chain  */
+    temp = SDL_LoadBMP("img/frame_chain.bmp");
+    sys_t_ptr->frameChain_srf_ptr = SDL_DisplayFormat(temp) ;
+    SDL_FreeSurface(temp) ;
 
+    sys_makeTransparent (sys_t_ptr, sys_t_ptr->frameChain_srf_ptr) ;
 
 
     return (0) ;
@@ -230,13 +245,32 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
     /* roof */
-    /* show roof only when it has moved down */
-    if (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) {
+
+    sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT + 35 * game_t_ptr->roofShift ; /* 35 = 40 * sqrt(3) / 2 */
+
+    /* show roof only when it has moved down, ie NOT in start position */
+    bool showRoof = (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) ;
+
+        if (showRoof) {
+
         SDL_BlitSurface(sys_t_ptr->frameTop_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameTop_rect_ptr) ;
     }
 
+    /* chains */
+    SDL_Rect chainImg_rect ;
 
+    chainImg_rect.w = CHAIN_WIDTH ;
+    chainImg_rect.h = 35 * game_t_ptr->roofShift - ROOF_HEIGHT ;
+    chainImg_rect.x = 0 ;
+    chainImg_rect.y = 30 ;
 
+    if (showRoof) {
+
+        SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
+                        sys_t_ptr->frameChain1_rect_ptr);
+        SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
+                        sys_t_ptr->frameChain2_rect_ptr);
+    }
     /* BUBS*/
 
     SDL_Rect bub_rect ;
@@ -379,6 +413,7 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
     SDL_FreeSurface (sys_t_ptr->frame_srf_ptr) ;
     SDL_FreeSurface (sys_t_ptr->frameTop_srf_ptr) ;
+    SDL_FreeSurface (sys_t_ptr->frameChain_srf_ptr) ;
 
     SDL_FreeSurface (sys_t_ptr->screen_srf_ptr) ;
 
@@ -389,6 +424,8 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
     free (sys_t_ptr->frame_rect_ptr) ;
     free (sys_t_ptr->frameTop_rect_ptr) ;
     free (sys_t_ptr->launcher_rect_ptr) ;
+    free (sys_t_ptr->frameChain1_rect_ptr) ;
+    free (sys_t_ptr->frameChain2_rect_ptr) ;
     free (sys_t_ptr) ;
 
 

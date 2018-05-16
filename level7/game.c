@@ -604,7 +604,7 @@ int game_checkConnexity (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect, boo
 
         /* memory allocation for temp variables */
 
-        /* this temp will hold the current coordinates of spot whose connexity is checked */
+        /* this temp will hold the current coordinates (x = col, y = lig) of spot whose connexity is checked */
         SDL_Rect * bubCoord_rect = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
 	    /* this temp will hold the neighboring bubs */
@@ -818,38 +818,46 @@ bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rec
         printf (" returning bub at line = %d, col = %d\n", rect_ptr->y, rect_ptr->x) ;
     }
 
-    /* first check if it is within boundaries */
+    /* first check if it is within boundaries
+     *
+     * rect_ptr->y = lig
+     * rect_ptr->x = col
+     * */
 
-    /* Y coordinate : if y < 0 (beyond roof)
+    int col = rect_ptr->x ;
+    int lig = rect_ptr->y ;
+
+    /* Y coordinate : if y < 0 (above roof)
      * or y == bub_ny (beyond bottom line)
      * -> NULL */
-    if ((rect_ptr->y < 0) ) {
+    if ((lig < 0)  || (lig > (BUB_NY - game_t_ptr->roofShift)) ) {
+        //printf ("lig = %d\n", lig) ;
         return NULL ;
     }
 
     /* X coordinate
      * if even row : min_x = 0 max_x = 7 */
-    if ((rect_ptr->y % 2) == 0) {
+    if ((lig % 2) == 0) {
 
-        if ((rect_ptr->x < 0) || (rect_ptr->x > 7)) {
+        if ((col < 0) || (col > 7)) {
             return NULL ;
         }
     }
     /* if odd row : min_x = 0, max x = 6 */
     else {
 
-        if ((rect_ptr->x < 0) || (rect_ptr->x > 6)) {
+        if ((col < 0) || (col> 6)) {
             return NULL;
         }
     }
 
     /* then check if there is a bub : use bubs_array */
-    if (game_t_ptr->bubs_array[rect_ptr->y][rect_ptr->x] > 0) {
+    if (game_t_ptr->bubs_array[lig][col] > 0) {
 
         /* if so, return bub_t_ptr
          * with updated  Position_x, Position_y and color */
 
-        bub_t_neighbour_ptr->color = game_t_ptr->bubs_array[rect_ptr->y][rect_ptr->x] ;
+        bub_t_neighbour_ptr -> color = game_t_ptr -> bubs_array [ lig ] [ col ] ;
 
         return bub_t_neighbour_ptr ;
     }
@@ -895,7 +903,7 @@ int game_moveFallingBub (game_t * game_t_ptr) {
         } else { /* non-exploding bub */
 
             /* bub falling straight down */
-            bub_ptr->position->y += VELOC	ITY;
+            bub_ptr->position->y += VELOCITY;
         }
 
 
@@ -966,9 +974,7 @@ int game_shiftRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) {
 
     game_t_ptr->roofShift += 1 ;
 
-    sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT + 35 * game_t_ptr->roofShift ; /* 35 = 40 * sqrt(3) / 2 */
-
-    //printf ("Before : coord of (0, 0)") ;
+   //printf ("Before : coord of (0, 0)") ;
 
     game_setBubsArrayCenters (game_t_ptr) ;
 

@@ -19,7 +19,10 @@
 #define BOARD_TOP           31
 
 #define ROOF_HEIGHT         9
-#define ROOF_DELAY          20000 /* ms */
+#define ROOF_DELAY          1000 /* ms */
+
+#define CHAIN_WIDTH         23
+#define CHAIN_HEIGHT        560
 
 #define LAUNCHER_DIV        48 /*PI / LAUNCHER_DIV is the angular distance between each of the 45 launcher orientations*/
 #define PI                  3.14159265359
@@ -87,20 +90,32 @@ struct Sys_t {
 
     SDL_Rect * cache_rect_ptr ; /* to place the black cache to hide the launcher sprite */
 
+    /* roof */
     SDL_Surface * frameTop_srf_ptr ;
 
     SDL_Rect * frameTop_rect_ptr ; /* to place the roof */
 
+    /* chain */
+	SDL_Surface * frameChain_srf_ptr ;
+
+	SDL_Rect * frameChain1_rect_ptr ;
+    SDL_Rect * frameChain2_rect_ptr ;
+
+
+	/* gears */
     SDL_Surface * frameGears_srf_ptr ;
 
     SDL_Rect * frameGears_rect_ptr ;
 
+    /* little wheel */
 	SDL_Surface * frameWheel_srf_ptr ;
 
     SDL_Rect * frameWheel_rect_ptr ;
-	
+
+    /* next bub */
     SDL_Rect * nextBub_rect_ptr ;
-	
+
+    /* tux */
 	SDL_Surface * tux_srf_ptr ;
 	
 	SDL_Rect * tux_rect_ptr ;

@@ -152,9 +152,6 @@ int main()
         /* draw all the sprites and update the screen */
         sys_draw (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
 
-        /* here we check for game over (roof down, ...), that is, AFTER screen is updated (so player can see what happened */
-
-
     }
 
     /* free memory and quit*/
