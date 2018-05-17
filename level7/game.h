@@ -51,6 +51,10 @@ int game_gameOver () ;
 
 int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
+int game_resetColorsOnBoards (game_t * game_t_ptr) ;
+
+int game_getNextBubColor (game_t * game_t_ptr) ;
+
 
 
 #endif //S2_PROJ_GAME_H

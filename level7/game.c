@@ -98,6 +98,10 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
     game_t_ptr->bub_numFallingBubs = 0 ;
 
 
+    /* colors on board */
+    game_t_ptr->colorsOnBoard = (int *) malloc (NUM_COLOR * sizeof(int)) ;
+
+
     /* reset bub_connected_component to 0
      * and set head and tail to 0*/
     game_resetConnexity (game_t_ptr) ;
@@ -117,9 +121,13 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
 
+    /* populates board with bubs */
     game_resetBubsArray (game_t_ptr) ;
 
-    game_t_ptr->nextBubColor = getRandomNumber (NUM_COLOR) + 1 ;
+    /* populates bubs colors */
+    game_resetColorsOnBoards (game_t_ptr) ;
+
+    game_t_ptr->nextBubColor = game_getNextBubColor (game_t_ptr) ;
 
     bub_init (bub_t_ptr, game_t_ptr) ;
 
@@ -128,8 +136,6 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
 
-    /*  */
-    game_t_ptr->gearsOrientation = 20 ;
 
     return (0) ;
 }
@@ -216,13 +222,16 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
             int col = getRandomNumber(NUM_COLOR) + 1  ;
             //col = (col > 8) ? 8 : col ;
-            col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
+            //col = 6 ; //  0-black 1-blue 2-green 3-orange 4-pourpre 5-red 6-whi 7-yell
 
-            /* set whole lines of bubs here if you want to test */
+            /* 1 lines of bubs */
+            game_t_ptr->bubs_array[i][j] = (i==0) ? col : 0 ;
+
+            /* 3 lines of bubs */
             //game_t_ptr->bubs_array[i][j] = (i==0 || i == 1 || i == 2) ? col : 0 ;
 
             /* 3 bubs top left */
-            game_t_ptr->bubs_array[i][j] = (i==0 && (j ==0 || j==1 || j==2)) ? col : 0 ;
+            //game_t_ptr->bubs_array[i][j] = (i==0 && (j ==0 || j==1 || j==2)) ? col : 0 ;
 
             /* set all bubs to value */
             //game_t_ptr->bubs_array[i][j] = 7 ;
@@ -506,6 +515,9 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
     /* free pointers */
     free (bubCoord_rect) ;
     free (bub_t_top_ptr) ;
+
+    /* reset colorsOnBoard in case some bubs were dropped */
+    game_resetColorsOnBoards (game_t_ptr) ;
 
     return (0) ;
 }
@@ -1031,4 +1043,87 @@ int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_
         }
     }
     return 0 ;
+}
+
+
+/* ****************************************************************************************************************
+*   Reset array of bub colors so that it matches what is on the board
+ *   Function called after newGame() and cleanBoard()
+* ************************************************************************************************************** */
+int game_resetColorsOnBoards (game_t * game_t_ptr) {
+
+    bool debug = false ;
+
+    /* set array to 0 */
+    int i, j ;
+    for (i = 0 ; i < NUM_COLOR ; i += 1) {
+        game_t_ptr->colorsOnBoard[i] = 0 ;
+    }
+
+    if (debug) {
+        for (i = 0 ; i < NUM_COLOR ; i += 1) {
+            printf ("init colorsOnBoard[%d] = %d\n", i, game_t_ptr->colorsOnBoard[i]) ;
+        }
+
+    }
+
+    /* parses bubs_array and loads the colors */
+    for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+
+            if (game_t_ptr->bubs_array[i][j] != 0) { /* 0 is no bub */
+
+                /* -1 because color on bubs_array is sprite color -1 */
+                game_t_ptr->colorsOnBoard[game_t_ptr->bubs_array[i][j] - 1] = 1;
+            }
+        }
+    }
+
+
+    if (debug) {
+        for (i = 0 ; i < NUM_COLOR ; i += 1) {
+            printf ("loaded colorsOnBoard[%d] = %d\n", i, game_t_ptr->colorsOnBoard[i]) ;
+        }
+
+    }
+
+    return 0 ;
+}
+
+/* ****************************************************************************************************************
+*   Returns the color of next bub
+* ************************************************************************************************************** */
+int game_getNextBubColor (game_t * game_t_ptr) {
+
+    bool debug = false ;
+
+    int i ;
+
+    /* 0:black 1:blue 2:green 3: 4: 5:red 6: 7: */
+
+    if (debug) {
+        for (i = 0 ; i < NUM_COLOR ; i += 1) {
+            printf ("getNextBUb colorsOnBoard[%d] = %d\n", i, game_t_ptr->colorsOnBoard[i]) ;
+        }
+    }
+
+    /* make STACK of available colors */
+    int numOfColors = 0 ;
+    int availableColors [NUM_COLOR] ;
+
+    for (i = 0 ; i < NUM_COLOR ; i += 1) { /* i is the index of each color : 0-7 */
+       if (game_t_ptr->colorsOnBoard[i] == 1) { /* if there is a bub of i color on board */
+           availableColors[numOfColors] = i ; /* we add the color (i) to the available colors */
+           numOfColors += 1 ;
+       }
+    }
+
+    /* now we select randomly from the available colors */
+
+    /* add 1 before returning return */
+    return availableColors[getRandomNumber (numOfColors)] + 1   ;
 }

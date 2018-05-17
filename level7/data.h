@@ -19,7 +19,7 @@
 #define BOARD_TOP           31
 
 #define ROOF_HEIGHT         9
-#define ROOF_DELAY          1000 /* ms */
+#define ROOF_DELAY          10000 /* ms */
 
 #define CHAIN_WIDTH         23
 #define CHAIN_HEIGHT        560
@@ -131,8 +131,6 @@ struct Game_t {
 
     int launcherOrientation ; /* value : 0-45 /  22 (vertical) is start value */
 
-    int gearsOrientation ; /* value : 0-45 /  22 (vertical) is start value */
-
     SDL_Surface * bubs[NUM_COLOR] ;
 
     SDL_Surface * bubsEx[NUM_COLOR] ; /* exploding sprite : 30 images*/
@@ -158,6 +156,8 @@ struct Game_t {
     int roofTimer ; /* SDL_GetTicks timer to keep track of time for roof movement */
 
     int nextBubColor ;
+
+    int * colorsOnBoard ; /* keep tracks of the colors of bub currently on board */
 
 };
 typedef struct Game_t game_t ;

@@ -395,6 +395,8 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
     }
 
     free (game_t_ptr->bub_fifo) ;
+    free (game_t_ptr->colorsOnBoard) ;
+
 
     free (game_t_ptr) ;
 

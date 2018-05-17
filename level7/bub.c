@@ -31,7 +31,7 @@ int bub_init (bub_t * bub_t_ptr, game_t * game_t_ptr) {
      * so we add 1 here */
     bub_t_ptr->color = game_t_ptr->nextBubColor ;
 
-    game_t_ptr->nextBubColor = getRandomNumber (NUM_COLOR) + 1 ;
+    game_t_ptr->nextBubColor = game_getNextBubColor (game_t_ptr) ;
 
     bub_setSpriteNormal (game_t_ptr, bub_t_ptr) ;
 
