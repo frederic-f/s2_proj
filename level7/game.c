@@ -237,6 +237,29 @@ int game_resetBubsArray (game_t * game_t_ptr) {
             //game_t_ptr->bubs_array[i][j] = 7 ;
         }
     }
+                    
+    int level[BUB_NY][BUB_NX] = {   {0,0,0,6,3,0,0,0}, 
+                                    {0,0,3,2,6,0,0},
+                                    {0,0,2,6,3,2,0,0},
+                                    {0,6,3,2,6,3,0},
+                                    {0,3,2,6,3,2,6,0},
+                                    {2,6,3,2,6,3,6},
+									{6,3,2,6,3,2,6,3},
+									{0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0} } ; 
+    
+    /* load level */
+	for (i = 0 ; i < BUB_NY ; i += 1) {
+
+        /* number of bubs in a row depends on odd/even number of row */
+        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+        for (j = 0 ; j < j_max ; j +=1 ) {
+            game_t_ptr->bubs_array[i][j] = level[i][j] ;
+        }
+    }
 
 
     if (debug) {
