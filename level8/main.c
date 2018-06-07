@@ -82,6 +82,7 @@ int main()
     sys_t_ptr->snd_launch1 = Mix_LoadWAV("music/launch1.wav");
     sys_t_ptr->snd_bubsExplode = Mix_LoadWAV("music/bubsExploding.wav");
     sys_t_ptr->snd_levelCompleted = Mix_LoadWAV("music/level-completed.wav");
+    //sys_t_ptr->snd_gameOver = Mix_LoadWAV("music/player-down.wav");
     sys_t_ptr->snd_gameOver = Mix_LoadWAV("music/player-down.wav");
 
     if(!sys_t_ptr->snd_musique) {
@@ -110,7 +111,8 @@ int main()
     /* ****************************************************************************************************************
     * Starts a new game
     * ************************************************************************************************************** */
-    game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
+    sys_changeScreen (sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_WELCOME) ;
 
 
     /* ****************************************************************************************************************
@@ -130,30 +132,22 @@ int main()
         }
 
 
-        switch (sys_t_ptr->state) {
+        switch (sys_t_ptr->screen) {
 
 
-            case 0 : /* welcome screen */
-
-
-
-                break ;
-
-
-            case 1 :
+            case SCREEN_WELCOME : /* welcome screen */
 
 
 
                 break ;
 
 
-
-            case 2 : /* playing */
+            case SCREEN_PLAYING : /* playing */
 
                 /* play music */
                 /* Play music on first available channel*/
                 if (!sys_t_ptr->isPlayingMusic) {
-                    if(Mix_PlayChannel(-1, sys_t_ptr->snd_musique, 0)==-1) {
+                    if(Mix_PlayChannel(-1, sys_t_ptr->snd_musique, 10)==-1) {
                         printf("Mix_PlayChannel: %s\n",Mix_GetError()) ;
                     }
                     else {
@@ -207,7 +201,7 @@ int main()
                         if (bub_isBelowLimit (bub_t_ptr)) {
 
                             /* game over routine (message, etc.) */
-                            game_gameOver (game_t_ptr);
+                            game_gameOver (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
 
 
                             /* we reset */
@@ -217,7 +211,7 @@ int main()
                         /* we place the bub */
                         else {
 
-                             SDL_Rect * bubJustPlaced_rect ;
+                            SDL_Rect * bubJustPlaced_rect ;
 
                             /* place the new bub into non-moving bubs_array */
                             bubJustPlaced_rect = bub_place (bub_t_ptr, game_t_ptr) ;
@@ -234,11 +228,12 @@ int main()
                             /* check if game won */
                             if (game_checkVictory (game_t_ptr)) {
 
-                                /* victory message */
-                                printf ("VICTORY :-)\n") ;
 
-                                /* we reset */
-                                game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
+                                game_levelCompleted (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
+                                break ;
+
                             }
 
                             /* return bub to launcher */
@@ -266,7 +261,6 @@ int main()
 
     /* free memory and quit*/
     sys_cleanUp (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
-
 
     /* close TTF */
     TTF_Quit();

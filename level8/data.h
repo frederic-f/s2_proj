@@ -41,8 +41,12 @@
 #define NUM_COLOR	        8
 #define ROOFSHIFT           3
 
-#define SYS_STATE_WELCOME   0
-#define SYS_STATE_PLAYING   2
+#define SCREEN_WELCOME       0
+#define SCREEN_LEVEL_START   1
+#define SCREEN_PLAYING       2
+#define SCREEN_LEVEL_COMPLETED       3
+#define SCREEN_VICTORY       4
+#define SCREEN_GAMEOVER      5
 
 #define NB_LEVELS           3
 
@@ -62,6 +66,8 @@
 #define YEL                 8
 #define YELLOW              8
 
+#define SOUND_VICTORY       3
+#define SOUND_GAMEOVER       4
 
 #include <SDL.h>
 #include "SDL/SDL_mixer.h"
@@ -153,19 +159,34 @@ struct Sys_t {
     TTF_Font * scoreFont ;
     TTF_Font * screenFont ; /* for welcome, transition screens */
 
-    SDL_Surface * score ;
+    SDL_Color fontColor ;
 
+
+    SDL_Surface * score ;
     SDL_Rect * scorePosition_rect_ptr ;
 
-    SDL_Color fontColor ;
+
+    SDL_Surface * text_level ;
+    SDL_Rect * text_levelPosition_rect_ptr ;
 
 
     SDL_Surface * text_welcomeScreen_1 ;
     SDL_Rect * text_welcomeScreen_1_position_rect_ptr ;
 
-
     SDL_Surface * text_welcomeScreen_2 ;
     SDL_Rect * text_welcomeScreen_2_position_rect_ptr ;
+
+    SDL_Surface * text_victory_1 ;
+    SDL_Rect * text_victory_1_position_rect_ptr ;
+
+    SDL_Surface * text_victory_2 ;
+    SDL_Rect * text_victory_2_position_rect_ptr ;
+
+    SDL_Surface * text_gameover_1 ;
+    SDL_Rect * text_gameover_1_position_rect_ptr ;
+
+    SDL_Surface * text_gameover_2 ;
+    SDL_Rect * text_gameover_2_position_rect_ptr ;
 
     /* ******************************************************
     * Sounds and Music
@@ -177,11 +198,11 @@ struct Sys_t {
 
 
     /* ******************************************************
-    * System state => different screens
+    * System screen => different screens
      * (0:welcome, 1:start level, 2:playing, 3:level completed, 4:victory, 5:gameocer
     * **************************************************** */
 
-    int state ;
+    int screen ;
 
 };
 typedef struct Sys_t sys_t ;/* step of x motion */

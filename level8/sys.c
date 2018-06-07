@@ -145,9 +145,18 @@ int sys_init (sys_t * sys_t_ptr) {
     sys_t_ptr->scorePosition_rect_ptr->y = 20 ;
 
 
-    /* text score */
+    /* text level */
+    sys_t_ptr->text_level = TTF_RenderText_Solid (sys_t_ptr->scoreFont, "Niveau 1", sys_t_ptr->fontColor);
+
+    sys_t_ptr->text_levelPosition_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->text_levelPosition_rect_ptr->x = 570 ;
+    sys_t_ptr->text_levelPosition_rect_ptr->y = 20 ;
+
+
+    /* welcome text */
     sys_t_ptr->text_welcomeScreen_1 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "Puzzle Bobble", sys_t_ptr->fontColor);
-    sys_t_ptr->text_welcomeScreen_2 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "(S)tart or (q)uit", sys_t_ptr->fontColor);
+    sys_t_ptr->text_welcomeScreen_2 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "(J)ouer or (Q)uitter", sys_t_ptr->fontColor);
 
     sys_t_ptr->text_welcomeScreen_1_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
     sys_t_ptr->text_welcomeScreen_2_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
@@ -159,16 +168,37 @@ int sys_init (sys_t * sys_t_ptr) {
 
 
 
+    /* victory text */
+    sys_t_ptr->text_victory_1 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "Felicitations !", sys_t_ptr->fontColor);
+    sys_t_ptr->text_victory_2 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "(R)ejouer ?", sys_t_ptr->fontColor);
+
+    sys_t_ptr->text_victory_1_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+    sys_t_ptr->text_victory_2_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->text_victory_1_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_victory_1_position_rect_ptr->y = 100 ;
+    sys_t_ptr->text_victory_2_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_victory_2_position_rect_ptr->y = 300 ;
+
+
+    /* gameover text */
+    sys_t_ptr->text_gameover_1 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "Perdu !!", sys_t_ptr->fontColor);
+    sys_t_ptr->text_gameover_2 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "(R)ejouer ?", sys_t_ptr->fontColor);
+
+    sys_t_ptr->text_gameover_1_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+    sys_t_ptr->text_gameover_2_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->text_gameover_1_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_gameover_1_position_rect_ptr->y = 100 ;
+    sys_t_ptr->text_gameover_2_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_gameover_2_position_rect_ptr->y = 300 ;
+
+
     /* ******************************************************
     * Music and sounds
     * **************************************************** */
     sys_t_ptr->isPlayingMusic = false ;
 
-
-    /* ******************************************************
-    * Init state = show welcome screen
-    * **************************************************** */
-    sys_t_ptr->state = 0 ;
 
     return (0) ;
 }
@@ -264,9 +294,12 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
 
 
-    switch (sys_t_ptr->state) {
+    switch (sys_t_ptr->screen) {
 
-        case 0 :
+        case SCREEN_WELCOME :
+
+            /* back cacche */
+            SDL_FillRect (sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, blackColorForCache) ;
 
             /* welcome screen */
             SDL_BlitSurface(sys_t_ptr->text_welcomeScreen_1, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_welcomeScreen_1_position_rect_ptr); /* Blit du texte */
@@ -276,8 +309,34 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
             break ;
 
+        case SCREEN_VICTORY :
 
-        case 2 : /* playing */
+            /* back cacche */
+            SDL_FillRect (sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, blackColorForCache) ;
+
+            /* welcome screen */
+            SDL_BlitSurface(sys_t_ptr->text_victory_1, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_victory_1_position_rect_ptr); /* Blit du texte */
+            SDL_BlitSurface(sys_t_ptr->text_victory_2, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_victory_2_position_rect_ptr); /* Blit du texte */
+
+
+
+            break ;
+
+        case SCREEN_GAMEOVER :
+
+            /* back cacche */
+            SDL_FillRect (sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, blackColorForCache) ;
+
+            /* welcome screen */
+            SDL_BlitSurface(sys_t_ptr->text_gameover_1, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_gameover_1_position_rect_ptr); /* Blit du texte */
+            SDL_BlitSurface(sys_t_ptr->text_gameover_2, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_gameover_2_position_rect_ptr); /* Blit du texte */
+
+
+
+            break ;
+
+
+        case SCREEN_PLAYING : /* playing */
 
 
             SDL_FillRect(sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, blackColorForCache) ;
@@ -417,8 +476,13 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
             free (dumRect_ptr) ;
 
 
+            /* text */
+
             /* score */
             SDL_BlitSurface(sys_t_ptr->score, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->scorePosition_rect_ptr); /* Blit du texte */
+
+            /* level */
+            //SDL_BlitSurface(sys_t_ptr->text_level, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_levelPosition_rect_ptr);
 
             break ;
 
@@ -439,6 +503,12 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 * ************************************************************************************************************** */
 int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
+
+    bool debug = false ;
+
+
+    if (debug)
+        printf ("-> [sys_cleanUp]\n") ;
 
     TTF_CloseFont(sys_t_ptr->screenFont);
     TTF_CloseFont(sys_t_ptr->scoreFont);
@@ -486,24 +556,37 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
         free (game_t_ptr->bub_fifo[i]) ;
     }
 
+
+    if (debug)
+        printf ("Pos 2\n") ;
+
     free (game_t_ptr->bub_fifo) ;
     free (game_t_ptr->colorsOnBoard) ;
 
 
     free (game_t_ptr) ;
 
-
+    if (debug)
+        printf ("Pos 2.5\n") ;
 
     /* bub_t pointers */
 
-    free (bub_t_ptr->position) ;
-    free (bub_t_ptr->sprite_ptr) ;
-    free (bub_t_ptr) ;
+    //free (bub_t_ptr->position) ;
+    //free (bub_t_ptr->sprite_ptr) ;
+    //free (bub_t_ptr) ;
+
+
+    if (debug)
+        printf ("Pos 2.6\n") ;
 
 
     /* SDL pointers */
 
     SDL_FreeSurface (sys_t_ptr->launcher_srf_ptr) ;
+
+    if (debug)
+        printf ("Pos 2.7\n") ;
+
 
     SDL_FreeSurface (sys_t_ptr->frame_srf_ptr) ;
     SDL_FreeSurface (sys_t_ptr->frameTop_srf_ptr) ;
@@ -511,6 +594,9 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
     SDL_FreeSurface (sys_t_ptr->screen_srf_ptr) ;
 
+
+    if (debug)
+        printf ("Pos 3\n") ;
 
     /* sys_t_ptr pointers */
 
@@ -560,16 +646,93 @@ SDL_Rect * sys_getBubPositionRect(game_t * game_t_ptr, int i, int j, SDL_Rect * 
 /* ****************************************************************************************************************
 *   Handles changes to make when changing states
 * ************************************************************************************************************** */
-int sys_changeState (sys_t * sys_t_ptr, int newState) {
+int sys_changeScreen (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr, int newScreen) {
 
-    switch (newState) {
+
+    /* stop music */
+    sys_stopAllSounds (sys_t_ptr) ;
+
+    switch (newScreen) {
+
+        case SCREEN_WELCOME :
+
+            break ;
+
+        case SCREEN_PLAYING :
+
+            game_newGame (sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+
+            break ;
+
+        case SCREEN_VICTORY :
+
+            sys_playSound (sys_t_ptr, SOUND_VICTORY) ;
+
+            break ;
+
+        case SCREEN_GAMEOVER :
+
+            sys_playSound (sys_t_ptr, SOUND_GAMEOVER) ;
+
+            break ;
+
 
     }
 
-    sys_t_ptr->state = newState ;
+    sys_t_ptr->screen = newScreen ;
 
     return 0 ;
 }
+
+
+/* ****************************************************************************************************************
+*   Play sound
+* ************************************************************************************************************** */
+int sys_playSound (sys_t * sys_t_ptr, int sound) {
+
+    switch (sound) {
+
+        case SOUND_VICTORY :
+
+            if(Mix_PlayChannel(-1, sys_t_ptr->snd_levelCompleted, 0)==-1) {
+                printf("Mix_PlayChannel: %s\n",Mix_GetError()) ;
+            }
+
+            break ;
+
+
+        case SOUND_GAMEOVER :
+
+            if(Mix_PlayChannel(-1, sys_t_ptr->snd_gameOver, 0)==-1) {
+                printf("Mix_PlayChannel: %s\n",Mix_GetError()) ;
+            }
+
+            break ;
+
+
+
+    }
+
+    return 0 ;
+}
+
+
+
+/* ****************************************************************************************************************
+*   Stop all sounds and Music playing
+* ************************************************************************************************************** */
+int sys_stopAllSounds (sys_t * sys_t_ptr) {
+
+    /* stop music */
+    Mix_HaltChannel(-1);
+
+    sys_t_ptr->isPlayingMusic = false ;
+
+    return 0 ;
+}
+
+
+
 
 
 /* ****************************************************************************************************************
@@ -612,12 +775,20 @@ void sys_handleEvent (SDL_Event event, sys_t * sys_t_ptr, game_t * game_t_ptr, b
                     }
                     break ;
 
-                case SDLK_s :
+                case SDLK_j :
 
                     /* switch to state "playing" */
-                    sys_changeState(sys_t_ptr, SYS_STATE_PLAYING) ;
+                    sys_changeScreen (sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_PLAYING) ;
 
                     break ;
+
+                case SDLK_r :
+
+                    /* switch to state "playing" */
+                    sys_changeScreen (sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_PLAYING) ;
+
+                    break ;
+
 
                 default:
                     break;

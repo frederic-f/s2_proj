@@ -47,7 +47,7 @@ int game_shiftRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
 
 int game_resetRoofTimer (game_t * game_t_ptr) ;
 
-int game_gameOver (game_t * game_t_ptr) ;
+int game_gameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
@@ -58,6 +58,8 @@ int game_getNextBubColor (game_t * game_t_ptr) ;
 int game_scoreUpdate (sys_t * sys_t_ptr, game_t * game_t_ptr, int scoreToAdd) ;
 
 int game_scoreReset (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
+
+int game_levelCompleted (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 
 

@@ -116,6 +116,10 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
 * ************************************************************************************************************** */
 int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
+
+    game_init(game_t_ptr, sys_t_ptr) ;
+
+
     /* roof back to top */
     game_resetRoof(sys_t_ptr, game_t_ptr) ;
 
@@ -123,7 +127,7 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     game_t_ptr->launcherOrientation = 22 ;
 
 
-    game_t_ptr->level = 1 ;
+    game_t_ptr->level = 0 ;
 
     /* populates board with bubs */
     game_resetBubsArray (game_t_ptr) ;
@@ -147,6 +151,56 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
     return (0) ;
 }
+
+
+/* ****************************************************************************************************************
+*   Controls transitions between levels
+* ************************************************************************************************************** */
+int game_levelCompleted (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+
+    /* if there are other levels to completed, go to next level */
+    if ((game_t_ptr->level + 1) < NB_LEVELS) {
+
+        /* next level */
+        game_t_ptr->level += 1 ;
+
+        /* roof back to top */
+        game_resetRoof(sys_t_ptr, game_t_ptr) ;
+
+        /* launcher is vertical by default */
+        game_t_ptr->launcherOrientation = 22 ;
+
+        /* populates board with bubs */
+        game_resetBubsArray (game_t_ptr) ;
+
+        /* populates bubs colors */
+        game_resetColorsOnBoards (game_t_ptr) ;
+
+        game_t_ptr->nextBubColor = game_getNextBubColor (game_t_ptr) ;
+
+        bub_init (bub_t_ptr, game_t_ptr) ;
+
+        game_resetRoofTimer (game_t_ptr) ;
+
+
+    }
+    else {
+
+        /* change state to vicoty */
+        sys_changeScreen(sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_VICTORY) ;
+
+    }
+
+
+
+
+
+
+
+    return (0) ;
+}
+
 
 /* ****************************************************************************************************************
 *   Loads sprites and adds transparency
@@ -249,7 +303,7 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
 
 /* 2:blue 6:red 3:green */
-    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {RED,RED,YEL,YELLOW,BLUE,BLUE,GREEN,GREEN},
+/*    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {RED,RED,YEL,YELLOW,BLUE,BLUE,GREEN,GREEN},
                                                     {RED,RED,YELLOW,YELLOW,BLUE,BLUE,GREEN},
                                                     {BLUE,BLUE,GREEN,GREEN,RED,RED,YELLOW,YELLOW},
                                                     {BLUE,GREEN,GREEN,RED,RED,YELLOW,YELLOW},
@@ -283,10 +337,80 @@ int game_resetBubsArray (game_t * game_t_ptr) {
                                                    {0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0},
-                                                   {0,0,0,0,0,0,0,0} } } ;
+                                                   {0,0,0,0,0,0,0,0} } } ;*/
 
+    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {RED,RED,YEL,YELLOW,BLUE,BLUE,GREEN,GREEN},
+                                                              {RED,RED,YELLOW,YELLOW,BLUE,BLUE,GREEN},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} },
 
+                                                      {    {0,0,0,RED,GRE,0,0,0},
+                                                              {0,0,GRE,BLU,RED,0,0},
+                                                              {0,0,BLU,RED,GRE,BLU,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} },
 
+                                                      {    {BLU, BLU, YEL,RED, RED, YEL, BLU, BLU},
+                                                              {WHI, BLU, YEL, RED, YEL, BLU, PUR},
+                                                              {GRE, GRE, BLU, YEL, YEL, BLU, ORA, ORA},
+                                                              {BLA,WHI,BLU,YEL,BLU,GRE,GRE},
+                                                              {PUR,BLA,WHI,BLU,BLU,ORA,WHI,BLA},
+                                                              {ORA,PUR,YEL,BLU,RED,ORA,WHI},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} } } ;
+
+/* tests */
+/*    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {BLU,BLU,BLU,RED,RED,RED,RED,RED},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} },
+
+                                                      {    {BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE,BLUE},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} },
+
+                                                      {    {PUR,PUR,PUR,PUR,PUR,PUR,PUR,PUR},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0} } } ;*/
 
 
 
@@ -1088,7 +1212,13 @@ int game_resetRoofTimer (game_t * game_t_ptr) {
 /* ****************************************************************************************************************
 *   Game over routine
 * ************************************************************************************************************** */
-int game_gameOver (game_t * game_t_ptr) {
+int game_gameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
+
+
+    sys_changeScreen (sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_GAMEOVER) ;
+
+    return 0 ;
+
 
     /* game over message */
     printf ("GAME OVER :-(\n") ;
@@ -1116,9 +1246,9 @@ int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_
 
     for (i = 0 ; i < numBubs ; i += 1) {
         if (game_t_ptr->bubs_array[lastLineIndex][i] > 0) {
-            game_gameOver (game_t_ptr) ;
 
-            game_newGame(sys_t_ptr, game_t_ptr, bub_t_ptr) ;
+            sys_changeScreen(sys_t_ptr, game_t_ptr, bub_t_ptr, SCREEN_GAMEOVER) ;
+
         }
     }
     return 0 ;

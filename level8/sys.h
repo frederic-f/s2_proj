@@ -26,11 +26,13 @@ void sys_handleEvent (SDL_Event event, sys_t * sys_t_ptr, game_t * game_t_ptr, b
 
 SDL_Rect * sys_getBubPositionRect (game_t * game_t_ptr, int i, int j, SDL_Rect * dumRect_ptr) ;
 
-int sys_changeState (sys_t * sys_t_ptr, int newState) ;
+int sys_changeScreen (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr, int newScreen) ;
 
 int sys_loadSounds (sys_t * sys_t_ptr) ;
 
 int sys_playSound (sys_t * sys_t_ptr, int sound) ;
+
+int sys_stopAllSounds (sys_t * sys_t_ptr) ;
 
 short getRandomNumber (int max) ;
 
