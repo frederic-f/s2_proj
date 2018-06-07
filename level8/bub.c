@@ -160,6 +160,8 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 
     bool debug = false ;
 
+
+
     /* target_pos x and y */
 
     double * target_pos_x = (double *) malloc (sizeof(double)) ;
@@ -177,8 +179,6 @@ int bub_move (bub_t * bub_t_ptr, game_t * game_t_ptr)
 
     /* 1. COLLISION */
     if (bub_isColliding (bub_t_ptr, game_t_ptr, target_pos_x, target_pos_y)) {
-
-        //printf ("paf\n") ;
 
         bub_t_ptr->isMoving = false ;
 
@@ -240,7 +240,7 @@ SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
     bool debug = false ;
 
     if (debug)
-        printf ("placeing bub !\n") ;
+        printf ("-> [bub_place]\n") ;
 
     /* reference for positioning is the /center/ of the bub
      * so we have to add BUB_SIZE/2 to each coordinate */
@@ -288,11 +288,13 @@ SDL_Rect * bub_place (bub_t * bub_t_ptr, game_t * game_t_ptr) {
                     bub_just_placed->x = j ;
                     bub_just_placed->y = i ;
 
-                    return bub_just_placed ;
+
 
                     if (debug) {
                         printf("Bub color %d placed at Line %d Col %d\n", bub_t_ptr->color, i, j);
                     }
+
+                    return bub_just_placed ;
                 }
             }
         }

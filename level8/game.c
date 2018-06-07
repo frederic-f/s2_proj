@@ -248,38 +248,38 @@ int game_resetBubsArray (game_t * game_t_ptr) {
 
 
 
-
-    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {0,0,0,6,3,0,0,0},
-                                                    {0,0,3,2,6,0,0},
-                                                    {0,0,2,6,3,2,0,0},
-                                                    {0,6,3,2,6,3,0},
-                                                    {0,3,2,6,3,2,6,0},
-                                                    {2,6,3,2,6,3,6},
-                                                    {6,3,2,6,3,2,6,3},
+/* 2:blue 6:red 3:green */
+    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {RED,RED,YEL,YELLOW,BLUE,BLUE,GREEN,GREEN},
+                                                    {RED,RED,YELLOW,YELLOW,BLUE,BLUE,GREEN},
+                                                    {BLUE,BLUE,GREEN,GREEN,RED,RED,YELLOW,YELLOW},
+                                                    {BLUE,GREEN,GREEN,RED,RED,YELLOW,YELLOW},
+                                                             {0,0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0},
+                                                              {0,0,0,0,0,0,0,0},
                                                     {0,0,0,0,0,0,0},
                                                     {0,0,0,0,0,0,0,0},
                                                     {0,0,0,0,0,0,0},
                                                     {0,0,0,0,0,0,0,0} },
 
-                                              {    {0,0,0,1,3,0,0,0},
-                                                   {0,0,1,2,6,0,0},
-                                                   {0,0,1,6,3,2,0,0},
-                                                   {0,1,3,2,6,3,0},
-                                                   {0,3,2,6,3,2,6,0},
-                                                   {2,6,3,2,6,3,6},
-                                                   {6,3,2,6,3,2,6,3},
+                                              {    {0,0,0,RED,GRE,0,0,0},
+                                                   {0,0,GRE,BLU,RED,0,0},
+                                                   {0,0,BLU,RED,GRE,BLU,0,0},
+                                                   {0,RED,GRE,BLU,RED,BLU,0},
+                                                   {0,GRE,BLU,RED,GRE,BLU,RED,0},
+                                                   {BLU,RED,GRE,BLU,RED,GRE,BLU},
+                                                   {RED,GRE,BLU,RED,GRE,BLU,RED,GRE},
                                                    {0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0,0} },
 
-                                              {    {0,0,0,6,3,0,0,0},
-                                                   {0,0,3,2,6,0,0},
-                                                   {0,0,2,6,3,2,0,0},
-                                                   {0,6,3,2,6,3,0},
-                                                   {0,3,2,6,3,2,6,0},
-                                                   {2,6,3,2,6,3,6},
-                                                   {6,3,2,6,3,2,6,3},
+                                              {    {BLU, BLU, YEL,RED, RED, YEL, BLU, BLU},
+                                                   {WHI, BLU, YEL, RED, YEL, BLU, PUR},
+                                                   {GRE, GRE, BLU, YEL, YEL, BLU, ORA, ORA},
+                                                   {BLA,WHI,BLU,YEL,BLU,GRE,GRE},
+                                                   {PUR,BLA,WHI,BLU,BLU,ORA,WHI,BLA},
+                                                   {ORA,PUR,YEL,BLU,RED,ORA,WHI},
+                                                   {GRE, PUR, GRE, RED, YEL, PUR, GRE, BLA},
                                                    {0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0,0},
                                                    {0,0,0,0,0,0,0},
@@ -469,7 +469,7 @@ int game_cleanBoard (sys_t * sys_t_ptr, game_t * game_t_ptr, SDL_Rect * bubJustP
 
 
         /* sound bubs exploding*/
-        if(Mix_PlayChannel(-1, sys_t_ptr->bubsExplode, 0)==-1) {
+        if(Mix_PlayChannel(-1, sys_t_ptr->snd_bubsExplode, 0)==-1) {
             printf("Mix_PlayChannel: %s\n",Mix_GetError());
             // may be critical error, or maybe just no channels were free.
             // you could allocated another channel in that case...
@@ -822,6 +822,9 @@ int game_spotCheckConnexity (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, b
 
     bool debug = false ;
 
+    if (debug)
+        printf("[game_spotCheckConnexity]\n") ;
+
     /* if bub exists ...*/
     if ((bub_t_neighbour_ptr = game_getBubAt (game_t_ptr, bub_t_neighbour_ptr, bubCoord_rect)) != NULL) {
         if (debug)
@@ -901,7 +904,7 @@ bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rec
     bool debug = false ;
 
     if (debug) {
-        printf ("**entering getBubAt\n") ;
+        printf ("->[game_getBubAt]\n") ;
         printf (" returning bub at line = %d, col = %d\n", rect_ptr->y, rect_ptr->x) ;
     }
 
@@ -915,9 +918,9 @@ bub_t * game_getBubAt (game_t * game_t_ptr, bub_t * bub_t_neighbour_ptr, SDL_Rec
     int lig = rect_ptr->y ;
 
     /* Y coordinate : if y < 0 (above roof)
-     * or y == bub_ny (beyond bottom line)
+     * or y == bub_ny (beyond bottom line) --- remember that lig starts at 0
      * -> NULL */
-    if ((lig < 0)  || (lig > (BUB_NY - game_t_ptr->roofShift)) ) {
+    if ((lig < 0)  || (lig >= (BUB_NY - game_t_ptr->roofShift)) ) {
         //printf ("lig = %d\n", lig) ;
         return NULL ;
     }

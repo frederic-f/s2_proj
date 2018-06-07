@@ -604,6 +604,9 @@ void sys_handleEvent (SDL_Event event, sys_t * sys_t_ptr, game_t * game_t_ptr, b
         case SDL_KEYUP:
             switch (event.key.keysym.sym) {
                 case SDLK_SPACE:
+
+
+
                     if(!bub_t_ptr->isLaunching) {
                         bub_t_ptr->isLaunching = true ;
                     }

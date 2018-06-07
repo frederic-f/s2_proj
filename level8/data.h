@@ -46,6 +46,22 @@
 
 #define NB_LEVELS           3
 
+#define BLACK               1
+#define BLA                 1
+#define BLUE                2
+#define BLU                 2
+#define GREEN               3
+#define GRE                 3
+#define ORANGE              4
+#define ORA                 4
+#define POURPRE             5
+#define PUR                 5
+#define RED                 6
+#define WHITE               7
+#define WHI                 7
+#define YEL                 8
+#define YELLOW              8
+
 
 #include <SDL.h>
 #include "SDL/SDL_mixer.h"
@@ -155,7 +171,7 @@ struct Sys_t {
     * Sounds and Music
     * **************************************************** */
 
-    Mix_Chunk * musique, * launch1, * bubsExplode ;
+    Mix_Chunk * snd_musique, * snd_launch1, * snd_bubsExplode, * snd_gameOver, * snd_levelCompleted ;
 
     bool isPlayingMusic ;
 

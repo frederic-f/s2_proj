@@ -28,6 +28,10 @@ SDL_Rect * sys_getBubPositionRect (game_t * game_t_ptr, int i, int j, SDL_Rect *
 
 int sys_changeState (sys_t * sys_t_ptr, int newState) ;
 
+int sys_loadSounds (sys_t * sys_t_ptr) ;
+
+int sys_playSound (sys_t * sys_t_ptr, int sound) ;
+
 short getRandomNumber (int max) ;
 
 
