@@ -22,10 +22,11 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 
-void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
+void sys_handleEvent (SDL_Event event, sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 SDL_Rect * sys_getBubPositionRect (game_t * game_t_ptr, int i, int j, SDL_Rect * dumRect_ptr) ;
 
+int sys_changeState (sys_t * sys_t_ptr, int newState) ;
 
 short getRandomNumber (int max) ;
 

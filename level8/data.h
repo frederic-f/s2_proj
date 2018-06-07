@@ -41,8 +41,15 @@
 #define NUM_COLOR	        8
 #define ROOFSHIFT           3
 
+#define SYS_STATE_WELCOME   0
+#define SYS_STATE_PLAYING   2
+
+#define NB_LEVELS           3
+
 
 #include <SDL.h>
+#include "SDL/SDL_mixer.h"
+#include "SDL/SDL_ttf.h"
 #include <stdbool.h>
 
 
@@ -73,6 +80,7 @@ struct Bub_t {
     double explosion_y ;
 };
 typedef struct Bub_t bub_t ;
+typedef struct Bub_t * bub_t_p ;
 
 
 
@@ -122,6 +130,43 @@ struct Sys_t {
 
     int colorkey ; /* transparency color */
 
+    /* ******************************************************
+    * Fonts and text
+    * **************************************************** */
+
+    TTF_Font * scoreFont ;
+    TTF_Font * screenFont ; /* for welcome, transition screens */
+
+    SDL_Surface * score ;
+
+    SDL_Rect * scorePosition_rect_ptr ;
+
+    SDL_Color fontColor ;
+
+
+    SDL_Surface * text_welcomeScreen_1 ;
+    SDL_Rect * text_welcomeScreen_1_position_rect_ptr ;
+
+
+    SDL_Surface * text_welcomeScreen_2 ;
+    SDL_Rect * text_welcomeScreen_2_position_rect_ptr ;
+
+    /* ******************************************************
+    * Sounds and Music
+    * **************************************************** */
+
+    Mix_Chunk * musique, * launch1, * bubsExplode ;
+
+    bool isPlayingMusic ;
+
+
+    /* ******************************************************
+    * System state => different screens
+     * (0:welcome, 1:start level, 2:playing, 3:level completed, 4:victory, 5:gameocer
+    * **************************************************** */
+
+    int state ;
+
 };
 typedef struct Sys_t sys_t ;/* step of x motion */
 
@@ -158,6 +203,10 @@ struct Game_t {
     int nextBubColor ;
 
     int * colorsOnBoard ; /* keep tracks of the colors of bub currently on board */
+
+    int score ;
+
+    int level ;
 
 };
 typedef struct Game_t game_t ;

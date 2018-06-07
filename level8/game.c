@@ -52,6 +52,7 @@ int game_init (game_t * game_t_ptr, sys_t * sys_t_ptr) {
         game_t_ptr->bubs_array[i] = (int *) malloc(BUB_NX * sizeof(int)) ;
     }
 
+    game_t_ptr->level = 0 ;
     /* Reset bubs_array = removes all bubs from screen */
     game_resetBubsArray (game_t_ptr) ;
 
@@ -121,6 +122,9 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
 
+
+    game_t_ptr->level = 1 ;
+
     /* populates board with bubs */
     game_resetBubsArray (game_t_ptr) ;
 
@@ -135,6 +139,10 @@ int game_newGame (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
     /* launcher is vertical by default */
     game_t_ptr->launcherOrientation = 22 ;
+
+    game_scoreReset (sys_t_ptr, game_t_ptr) ;
+
+
 
 
     return (0) ;
@@ -237,27 +245,59 @@ int game_resetBubsArray (game_t * game_t_ptr) {
             //game_t_ptr->bubs_array[i][j] = 7 ;
         }
     }
-                    
-    int level[BUB_NY][BUB_NX] = {   {0,0,0,6,3,0,0,0}, 
-                                    {0,0,3,2,6,0,0},
-                                    {0,0,2,6,3,2,0,0},
-                                    {0,6,3,2,6,3,0},
-                                    {0,3,2,6,3,2,6,0},
-                                    {2,6,3,2,6,3,6},
-									{6,3,2,6,3,2,6,3},
-									{0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0,0} } ; 
-    
-    /* load level */
+
+
+
+
+    int levels[NB_LEVELS][BUB_NY][BUB_NX] =         { {    {0,0,0,6,3,0,0,0},
+                                                    {0,0,3,2,6,0,0},
+                                                    {0,0,2,6,3,2,0,0},
+                                                    {0,6,3,2,6,3,0},
+                                                    {0,3,2,6,3,2,6,0},
+                                                    {2,6,3,2,6,3,6},
+                                                    {6,3,2,6,3,2,6,3},
+                                                    {0,0,0,0,0,0,0},
+                                                    {0,0,0,0,0,0,0,0},
+                                                    {0,0,0,0,0,0,0},
+                                                    {0,0,0,0,0,0,0,0} },
+
+                                              {    {0,0,0,1,3,0,0,0},
+                                                   {0,0,1,2,6,0,0},
+                                                   {0,0,1,6,3,2,0,0},
+                                                   {0,1,3,2,6,3,0},
+                                                   {0,3,2,6,3,2,6,0},
+                                                   {2,6,3,2,6,3,6},
+                                                   {6,3,2,6,3,2,6,3},
+                                                   {0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0,0} },
+
+                                              {    {0,0,0,6,3,0,0,0},
+                                                   {0,0,3,2,6,0,0},
+                                                   {0,0,2,6,3,2,0,0},
+                                                   {0,6,3,2,6,3,0},
+                                                   {0,3,2,6,3,2,6,0},
+                                                   {2,6,3,2,6,3,6},
+                                                   {6,3,2,6,3,2,6,3},
+                                                   {0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0},
+                                                   {0,0,0,0,0,0,0,0} } } ;
+
+
+
+
+
+
+/* load level */
 	for (i = 0 ; i < BUB_NY ; i += 1) {
 
         /* number of bubs in a row depends on odd/even number of row */
         int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
 
         for (j = 0 ; j < j_max ; j +=1 ) {
-            game_t_ptr->bubs_array[i][j] = level[i][j] ;
+            game_t_ptr->bubs_array[i][j] = levels[game_t_ptr->level][i][j] ;
         }
     }
 
@@ -386,7 +426,7 @@ int game_resetConnexity (game_t * game_t_ptr) {
 /* ****************************************************************************************************************
 *   Controls connexity cheks (color-connexity and roof-connexity) and deletes non-connected bubs
 * ************************************************************************************************************** */
-int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
+int game_cleanBoard (sys_t * sys_t_ptr, game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
 
     bool debug = false ;
 
@@ -426,6 +466,18 @@ int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlaced_rect) {
             /* delete bub from bubs_array */
             game_t_ptr->bubs_array[game_t_ptr->bub_fifo[i][0]][game_t_ptr->bub_fifo[i][1]] = 0 ;
         }
+
+
+        /* sound bubs exploding*/
+        if(Mix_PlayChannel(-1, sys_t_ptr->bubsExplode, 0)==-1) {
+            printf("Mix_PlayChannel: %s\n",Mix_GetError());
+            // may be critical error, or maybe just no channels were free.
+            // you could allocated another channel in that case...
+        }
+
+        /* update score */
+        game_scoreUpdate(sys_t_ptr, game_t_ptr, game_t_ptr->fifoHead * 10) ;
+
     }
 
     /* reset head, tail, bub_connected */
@@ -1033,10 +1085,11 @@ int game_resetRoofTimer (game_t * game_t_ptr) {
 /* ****************************************************************************************************************
 *   Game over routine
 * ************************************************************************************************************** */
-int game_gameOver () {
+int game_gameOver (game_t * game_t_ptr) {
 
     /* game over message */
     printf ("GAME OVER :-(\n") ;
+    printf ("Your score: %d\n\n", game_t_ptr->score) ;
 
     return 0 ;
 }
@@ -1060,7 +1113,7 @@ int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_
 
     for (i = 0 ; i < numBubs ; i += 1) {
         if (game_t_ptr->bubs_array[lastLineIndex][i] > 0) {
-            game_gameOver () ;
+            game_gameOver (game_t_ptr) ;
 
             game_newGame(sys_t_ptr, game_t_ptr, bub_t_ptr) ;
         }
@@ -1149,4 +1202,33 @@ int game_getNextBubColor (game_t * game_t_ptr) {
 
     /* add 1 before returning return */
     return availableColors[getRandomNumber (numOfColors)] + 1   ;
+}
+
+
+/* ****************************************************************************************************************
+*   Resets score
+* ************************************************************************************************************** */
+int game_scoreReset (sys_t * sys_t_ptr, game_t * game_t_ptr) {
+
+    game_t_ptr->score = 0 ;
+
+    char str[10] ;
+    sprintf(str, "%08d", game_t_ptr->score);
+    sys_t_ptr->score = TTF_RenderText_Solid (sys_t_ptr->scoreFont, str, sys_t_ptr->fontColor);
+
+
+    return 0 ;
+}
+
+
+int game_scoreUpdate (sys_t * sys_t_ptr, game_t * game_t_ptr, int addToScore) {
+
+    game_t_ptr->score = game_t_ptr->score + addToScore ;
+
+    char str[10] ;
+    sprintf(str, "%08d", game_t_ptr->score);
+    sys_t_ptr->score = TTF_RenderText_Solid (sys_t_ptr->scoreFont, str, sys_t_ptr->fontColor);
+
+
+    return 0 ;
 }

@@ -1,4 +1,6 @@
 #include <SDL.h>
+#include "SDL/SDL_mixer.h"
+#include "SDL/SDL_ttf.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +30,12 @@ int sys_init (sys_t * sys_t_ptr) {
     SDL_EnableKeyRepeat(10, 30);
 
     sys_t_ptr->screen_srf_ptr = SDL_SetVideoMode (SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+
+
+    /* set font */
+    //sys_t_ptr->police = TTF_OpenFont("/home/pv1/Documents/s2_proj/level8/ttf/arcadeclassic.ttf", 25);
+    //if(!sys_t_ptr->police){printf("Unable to open font");exit(1);} //The program exits here
+
 
     /* set color that is to be transparent */
     sys_t_ptr->colorkey = SDL_MapRGB(sys_t_ptr->screen_srf_ptr->format, 255, 0, 255);
@@ -115,6 +123,53 @@ int sys_init (sys_t * sys_t_ptr) {
     sys_t_ptr->cache_rect_ptr->h = SCREEN_HEIGHT ;
 
 
+    /* ******************************************************
+    * Fonts and text
+    * **************************************************** */
+
+    /* font */
+    SDL_Color fontColor = {255, 255, 255};
+    sys_t_ptr->fontColor = fontColor ;
+
+    sys_t_ptr->scoreFont = TTF_OpenFont("/home/pv1/Documents/s2_proj/level8/ttf/game_over.ttf", 65);
+
+    sys_t_ptr->screenFont = TTF_OpenFont("/home/pv1/Documents/s2_proj/level8/ttf/game_over.ttf", 125);
+
+
+    /* text score */
+    sys_t_ptr->score = TTF_RenderText_Solid (sys_t_ptr->scoreFont, "000000", sys_t_ptr->fontColor);
+
+    sys_t_ptr->scorePosition_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->scorePosition_rect_ptr->x = 20 ;
+    sys_t_ptr->scorePosition_rect_ptr->y = 20 ;
+
+
+    /* text score */
+    sys_t_ptr->text_welcomeScreen_1 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "Puzzle Bobble", sys_t_ptr->fontColor);
+    sys_t_ptr->text_welcomeScreen_2 = TTF_RenderText_Solid (sys_t_ptr->screenFont, "(S)tart or (q)uit", sys_t_ptr->fontColor);
+
+    sys_t_ptr->text_welcomeScreen_1_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+    sys_t_ptr->text_welcomeScreen_2_position_rect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+    sys_t_ptr->text_welcomeScreen_1_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_welcomeScreen_1_position_rect_ptr->y = 100 ;
+    sys_t_ptr->text_welcomeScreen_2_position_rect_ptr->x = 100 ;
+    sys_t_ptr->text_welcomeScreen_2_position_rect_ptr->y = 300 ;
+
+
+
+    /* ******************************************************
+    * Music and sounds
+    * **************************************************** */
+    sys_t_ptr->isPlayingMusic = false ;
+
+
+    /* ******************************************************
+    * Init state = show welcome screen
+    * **************************************************** */
+    sys_t_ptr->state = 0 ;
+
     return (0) ;
 }
 
@@ -200,145 +255,176 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 
     bool debug = false ;
 
+
     /* cache */
     /* cache will be black */
-    int color = SDL_MapRGB(sys_t_ptr->screen_srf_ptr->format, 0, 0, 0) ;
-
-    SDL_FillRect(sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, color) ;
-
-
-    /* frame */
-    SDL_BlitSurface(sys_t_ptr->frame_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frame_rect_ptr) ;
+    int blackColorForCache ;
+    blackColorForCache = SDL_MapRGB(sys_t_ptr->screen_srf_ptr->format, 0, 0, 0) ;
 
 
 
-    /* gears */
-    SDL_Rect gearsImg_rect ;
 
-    gearsImg_rect.w = GEARS_WIDTH ;
-    gearsImg_rect.h = GEARS_HEIGHT ;
-    gearsImg_rect.x = 0 ; // the image is moved in height, not in width
-    gearsImg_rect.y = GEARS_HEIGHT * round(game_t_ptr->launcherOrientation / 45. * 20) ; /* there are only 40 positions for gears... */
+    switch (sys_t_ptr->state) {
 
-    SDL_BlitSurface(sys_t_ptr->frameGears_srf_ptr, &gearsImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameGears_rect_ptr) ;
+        case 0 :
 
-	/* Wheel */
-    SDL_Rect wheelImg_rect ;
-
-    wheelImg_rect.w = WHEEL_WIDTH ;
-    wheelImg_rect.h = WHEEL_HEIGHT ;
-    wheelImg_rect.x = 0 ; // the image is moved in height, not in width
-    wheelImg_rect.y = 0 ;
-
-    SDL_BlitSurface(sys_t_ptr->frameWheel_srf_ptr, &wheelImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameWheel_rect_ptr) ;
-	
-	
-    /* launcher */
-    SDL_Rect launcherImg_rect ;
-
-    launcherImg_rect.w = LAUNCHER_WIDTH ;
-    launcherImg_rect.h = LAUNCHER_HEIGHT ;
-    launcherImg_rect.x = 0 ; // the image is moved in height, not in width
-    launcherImg_rect.y = LAUNCHER_HEIGHT * game_t_ptr->launcherOrientation ;
-
-    SDL_BlitSurface(sys_t_ptr->launcher_srf_ptr, &launcherImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->launcher_rect_ptr) ;
+            /* welcome screen */
+            SDL_BlitSurface(sys_t_ptr->text_welcomeScreen_1, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_welcomeScreen_1_position_rect_ptr); /* Blit du texte */
+            SDL_BlitSurface(sys_t_ptr->text_welcomeScreen_2, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->text_welcomeScreen_2_position_rect_ptr); /* Blit du texte */
 
 
-    /* roof */
 
-    sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT + 35 * game_t_ptr->roofShift ; /* 35 = 40 * sqrt(3) / 2 */
-
-    /* show roof only when it has moved down, ie NOT in start position */
-    bool showRoof = (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) ;
-
-        if (showRoof) {
-
-        SDL_BlitSurface(sys_t_ptr->frameTop_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameTop_rect_ptr) ;
-    }
-
-    /* chains */
-    SDL_Rect chainImg_rect ;
-
-    chainImg_rect.w = CHAIN_WIDTH ;
-    chainImg_rect.h = 35 * game_t_ptr->roofShift - ROOF_HEIGHT ;
-    chainImg_rect.x = 0 ;
-    chainImg_rect.y = 30 ;
-
-    if (showRoof) {
-
-        SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
-                        sys_t_ptr->frameChain1_rect_ptr);
-        SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
-                        sys_t_ptr->frameChain2_rect_ptr);
-    }
-    /* BUBS*/
-
-    SDL_Rect bub_rect ;
-    bub_rect.w = BUB_SIZE ;
-    bub_rect.h = BUB_SIZE ;
-    bub_rect.x = 0 ;
-    bub_rect.y = 0 ;
-
-    /* moving bub */
-    SDL_BlitSurface (bub_t_ptr->sprite_ptr, bub_t_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
+            break ;
 
 
-    /* next bub */
-    SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->nextBubColor - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->nextBub_rect_ptr);
+        case 2 : /* playing */
 
 
-    /* draw non-moving bubs */
+            SDL_FillRect(sys_t_ptr->screen_srf_ptr, sys_t_ptr->cache_rect_ptr, blackColorForCache) ;
 
-    /* we use a pointer to place the non-moving bubs
-     * the same pointer is used for all non-moving bubs
-     * it is updated as we parse through the array of non-moving bubs
-     * */
-    SDL_Rect * dumRect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
 
-    int i, j ;
+            /* frame */
+            SDL_BlitSurface(sys_t_ptr->frame_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frame_rect_ptr) ;
 
-    /* parsing the array of non-moving bubs : i=rows, j=cols */
-    for (i = 0 ; i < BUB_NY ; i += 1) {
 
-        /* number of bubs in a row depends on odd/even number of row */
-        int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
 
-        for (j = 0 ; j < j_max ; j +=1 ) {
+            /* gears */
+            SDL_Rect gearsImg_rect ;
 
-            /* process only the bubs set to 1 */
-            if (game_t_ptr->bubs_array[i][j] > 0) {
+            gearsImg_rect.w = GEARS_WIDTH ;
+            gearsImg_rect.h = GEARS_HEIGHT ;
+            gearsImg_rect.x = 0 ; // the image is moved in height, not in width
+            gearsImg_rect.y = GEARS_HEIGHT * round(game_t_ptr->launcherOrientation / 45. * 20) ; /* there are only 40 positions for gears... */
 
-                /* update the position of the bub to display */
-                dumRect_ptr = sys_getBubPositionRect(game_t_ptr, i, j, dumRect_ptr);
+            SDL_BlitSurface(sys_t_ptr->frameGears_srf_ptr, &gearsImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameGears_rect_ptr) ;
 
-                /* display */
-                SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->bubs_array[i][j] - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, dumRect_ptr);
+            /* Wheel */
+            SDL_Rect wheelImg_rect ;
+
+            wheelImg_rect.w = WHEEL_WIDTH ;
+            wheelImg_rect.h = WHEEL_HEIGHT ;
+            wheelImg_rect.x = 0 ; // the image is moved in height, not in width
+            wheelImg_rect.y = 0 ;
+
+            SDL_BlitSurface(sys_t_ptr->frameWheel_srf_ptr, &wheelImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameWheel_rect_ptr) ;
+
+
+            /* launcher */
+            SDL_Rect launcherImg_rect ;
+
+            launcherImg_rect.w = LAUNCHER_WIDTH ;
+            launcherImg_rect.h = LAUNCHER_HEIGHT ;
+            launcherImg_rect.x = 0 ; // the image is moved in height, not in width
+            launcherImg_rect.y = LAUNCHER_HEIGHT * game_t_ptr->launcherOrientation ;
+
+            SDL_BlitSurface(sys_t_ptr->launcher_srf_ptr, &launcherImg_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->launcher_rect_ptr) ;
+
+
+            /* roof */
+
+            sys_t_ptr->frameTop_rect_ptr->y = BOARD_TOP - ROOF_HEIGHT + 35 * game_t_ptr->roofShift ; /* 35 = 40 * sqrt(3) / 2 */
+
+            /* show roof only when it has moved down, ie NOT in start position */
+            bool showRoof = (sys_t_ptr->frameTop_rect_ptr->y != (BOARD_TOP - ROOF_HEIGHT)) ;
+
+                if (showRoof) {
+
+                SDL_BlitSurface(sys_t_ptr->frameTop_srf_ptr, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->frameTop_rect_ptr) ;
             }
-        }
+
+            /* chains */
+            SDL_Rect chainImg_rect ;
+
+            chainImg_rect.w = CHAIN_WIDTH ;
+            chainImg_rect.h = 35 * game_t_ptr->roofShift - ROOF_HEIGHT ;
+            chainImg_rect.x = 0 ;
+            chainImg_rect.y = 30 ;
+
+            if (showRoof) {
+
+                SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
+                                sys_t_ptr->frameChain1_rect_ptr);
+                SDL_BlitSurface(sys_t_ptr->frameChain_srf_ptr, &chainImg_rect, sys_t_ptr->screen_srf_ptr,
+                                sys_t_ptr->frameChain2_rect_ptr);
+            }
+            /* BUBS*/
+
+            SDL_Rect bub_rect ;
+            bub_rect.w = BUB_SIZE ;
+            bub_rect.h = BUB_SIZE ;
+            bub_rect.x = 0 ;
+            bub_rect.y = 0 ;
+
+            /* moving bub */
+            SDL_BlitSurface (bub_t_ptr->sprite_ptr, bub_t_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_t_ptr->position) ;
+
+
+            /* next bub */
+            SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->nextBubColor - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, sys_t_ptr->nextBub_rect_ptr);
+
+
+            /* draw non-moving bubs */
+
+            /* we use a pointer to place the non-moving bubs
+             * the same pointer is used for all non-moving bubs
+             * it is updated as we parse through the array of non-moving bubs
+             * */
+            SDL_Rect * dumRect_ptr = (SDL_Rect *) malloc (sizeof (SDL_Rect)) ;
+
+            int i, j ;
+
+            /* parsing the array of non-moving bubs : i=rows, j=cols */
+            for (i = 0 ; i < BUB_NY ; i += 1) {
+
+                /* number of bubs in a row depends on odd/even number of row */
+                int j_max = (i % 2 == 0) ? BUB_NX : BUB_NX - 1 ;
+
+                for (j = 0 ; j < j_max ; j +=1 ) {
+
+                    /* process only the bubs set to 1 */
+                    if (game_t_ptr->bubs_array[i][j] > 0) {
+
+                        /* update the position of the bub to display */
+                        dumRect_ptr = sys_getBubPositionRect(game_t_ptr, i, j, dumRect_ptr);
+
+                        /* display */
+                        SDL_BlitSurface(game_t_ptr->bubs[game_t_ptr->bubs_array[i][j] - 1], &bub_rect, sys_t_ptr->screen_srf_ptr, dumRect_ptr);
+                    }
+                }
+            }
+
+            /* draw falling bubs */
+            if (game_t_ptr->bub_numFallingBubs > 0) {
+
+                int i ;
+
+                if (debug)
+                    printf ("[sys_draw] Num of bubs falling %d\n", game_t_ptr -> bub_numFallingBubs) ;
+
+                for (i = 0 ; i < (game_t_ptr -> bub_numFallingBubs) ; i += 1) {
+
+
+                    struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
+
+                    if (debug)
+                        printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
+
+                    SDL_BlitSurface (bub_ptr->sprite_ptr, bub_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
+
+                }
+            }
+
+            free (dumRect_ptr) ;
+
+
+            /* score */
+            SDL_BlitSurface(sys_t_ptr->score, NULL, sys_t_ptr->screen_srf_ptr, sys_t_ptr->scorePosition_rect_ptr); /* Blit du texte */
+
+            break ;
+
     }
 
-    /* draw falling bubs */
-    if (game_t_ptr->bub_numFallingBubs > 0) {
 
-        int i ;
-
-        if (debug)
-            printf ("[sys_draw] Num of bubs falling %d\n", game_t_ptr -> bub_numFallingBubs) ;
-
-        for (i = 0 ; i < (game_t_ptr -> bub_numFallingBubs) ; i += 1) {
-
-
-            struct Bub_t * bub_ptr = game_t_ptr->bub_fallingBubs[i] ;
-
-            if (debug)
-                printf ("[sys_draw] Bub #%d (color: %d) (Pos x:%d, y:%d) is falling\n", i, bub_ptr->color, bub_ptr->position->x, bub_ptr->position->y) ;
-
-            SDL_BlitSurface (bub_ptr->sprite_ptr, bub_ptr->spriteFrame, sys_t_ptr->screen_srf_ptr, bub_ptr->position) ;
-
-        }
-    }
-
-    free (dumRect_ptr) ;
 
     /* update the screen */
     SDL_UpdateRect(sys_t_ptr->screen_srf_ptr, 0, 0, 0, 0);
@@ -353,7 +439,13 @@ int sys_draw (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) {
 * ************************************************************************************************************** */
 int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
 
+
+    TTF_CloseFont(sys_t_ptr->screenFont);
+    TTF_CloseFont(sys_t_ptr->scoreFont);
     int i, j ;
+
+    /* font */
+    //TTF_CloseFont(sys_t_ptr->police);
 
     /* game_t_ptr pointers */
 
@@ -434,6 +526,9 @@ int sys_cleanUp (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)  {
     /* Quit framework */
     SDL_Quit ();
 
+
+
+
     return (0) ;
 }
 
@@ -463,6 +558,21 @@ SDL_Rect * sys_getBubPositionRect(game_t * game_t_ptr, int i, int j, SDL_Rect * 
 
 
 /* ****************************************************************************************************************
+*   Handles changes to make when changing states
+* ************************************************************************************************************** */
+int sys_changeState (sys_t * sys_t_ptr, int newState) {
+
+    switch (newState) {
+
+    }
+
+    sys_t_ptr->state = newState ;
+
+    return 0 ;
+}
+
+
+/* ****************************************************************************************************************
 *   Returns a random number between 0 and (max - 1)
 * ************************************************************************************************************** */
 short getRandomNumber(int max) {
@@ -483,7 +593,7 @@ short getRandomNumber(int max) {
 /* ****************************************************************************************************************
 *   Detects SDL events
 * ************************************************************************************************************** */
-void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
+void sys_handleEvent (SDL_Event event, sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr)
 {
     switch (event.type) {
         /* close button  clicked */
@@ -498,6 +608,14 @@ void sys_handleEvent (SDL_Event event, game_t * game_t_ptr, bub_t * bub_t_ptr)
                         bub_t_ptr->isLaunching = true ;
                     }
                     break ;
+
+                case SDLK_s :
+
+                    /* switch to state "playing" */
+                    sys_changeState(sys_t_ptr, SYS_STATE_PLAYING) ;
+
+                    break ;
+
                 default:
                     break;
             }

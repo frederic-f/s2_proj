@@ -25,7 +25,7 @@ int game_resetBubConnectedComponent (game_t * game_t_ptr) ;
 
 int game_resetConnexity (game_t * game_t_ptr) ;
 
-int game_cleanBoard (game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
+int game_cleanBoard (sys_t * sys_t_ptr, game_t * game_t_ptr, SDL_Rect * bubJustPlace_rect) ;
 
 int game_addFallingBub (game_t * game_t_ptr, int color, int line, int col, bool isExploding) ;
 
@@ -47,13 +47,17 @@ int game_shiftRoof (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
 
 int game_resetRoofTimer (game_t * game_t_ptr) ;
 
-int game_gameOver () ;
+int game_gameOver (game_t * game_t_ptr) ;
 
 int game_checkRoofGameOver (sys_t * sys_t_ptr, game_t * game_t_ptr, bub_t * bub_t_ptr) ;
 
 int game_resetColorsOnBoards (game_t * game_t_ptr) ;
 
 int game_getNextBubColor (game_t * game_t_ptr) ;
+
+int game_scoreUpdate (sys_t * sys_t_ptr, game_t * game_t_ptr, int scoreToAdd) ;
+
+int game_scoreReset (sys_t * sys_t_ptr, game_t * game_t_ptr) ;
 
 
 

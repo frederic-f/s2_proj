@@ -76,6 +76,7 @@ typedef struct Bub_t bub_t ;
 
 
 
+
 struct Sys_t {
 
     SDL_Surface * screen_srf_ptr ;
